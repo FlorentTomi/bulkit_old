@@ -1,0 +1,16 @@
+[versions]
+bulkit = "0.1.0-alpha"
+minecraft = "1.21"
+kotlin-jvm = "2.0.0"
+neoforged-moddev = "0.1.99"
+neoforged-neoforge = "21.0.37-beta"
+parchment-mappings = "2024.06.23"
+parchment-minecraft = "1.21"
+kotlinForForge = "5.3.0"
+
+[libraries]
+kotlinForForge = { module = "thedarkcolour:kotlinforforge-neoforge", version.ref = "kotlinForForge" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-jvm" }
+neoforged-moddev = { id = "net.neoforged.moddev", version.ref = "neoforged-moddev" }
