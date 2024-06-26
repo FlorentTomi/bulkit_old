@@ -1,12 +1,8 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    `java-library`
-    eclipse
-    idea
-
-    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.neoforged.moddev)
+    alias(libs.plugins.kotlin.jvm)
 }
 
 tasks.withType<Wrapper>().configureEach {
@@ -46,6 +42,7 @@ neoForge {
 
     mods {
         create(ModConstants.ID) {
+            sourceSet(apiSourceSet)
             sourceSet(sourceSets.main.get())
         }
     }
@@ -125,10 +122,19 @@ fun createModExtension(name: String) {
             exclude(".cache")
         }
     }
+    // This enables IntelliJ to know that you need the addons when you run the main run
+    sourceSets["main"].runtimeClasspath += sourceSet.output
 
     val mod = neoForge.mods.create(id) {
         sourceSet(sourceSet)
     }
+
+    val buildJar = tasks.register<Jar>(sourceSet.jarTaskName) {
+        group = "build"
+        archiveClassifier = name
+        from(sourceSet.output)
+    }
+    tasks.getByName("assemble").dependsOn(buildJar)
 
     neoForge {
         addModdingDependenciesTo(sourceSet)
