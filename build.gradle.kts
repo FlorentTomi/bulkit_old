@@ -24,11 +24,30 @@ base.archivesName = ModConstants.ID
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 kotlin.compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
 
+sourceSets {
+    main {
+        resources {
+            srcDir("src/dataGen/${ModConstants.ID}/resources")
+            exclude(".cache")
+        }
+    }
+}
+
+val apiSourceSet = sourceSets.create("api")
+
 neoForge {
     version = libs.versions.neoforged.neoforge
     parchment {
         mappingsVersion = libs.versions.parchment.mappings
         minecraftVersion = libs.versions.parchment.minecraft
+    }
+
+    addModdingDependenciesTo(apiSourceSet)
+
+    mods {
+        create(ModConstants.ID) {
+            sourceSet(sourceSets.main.get())
+        }
     }
 
     runs {
@@ -53,7 +72,7 @@ neoForge {
             programArguments.addAll(
                 "--mod", ModConstants.ID,
                 "--all",
-                "--output", file("src/generated/resources/").absolutePath,
+                "--output", file("src/dataGen/").absolutePath,
                 "--existing", file("src/main/resources/").absolutePath
             )
         }
@@ -61,25 +80,17 @@ neoForge {
         configureEach {
             systemProperty("forge.logging.markers", "REGISTRIES")
             logLevel = org.slf4j.event.Level.DEBUG
-        }
-    }
-
-    mods {
-        create(ModConstants.ID) {
-            sourceSet(sourceSets.main.get())
-        }
-
-        dependencies {
-            implementation(libs.kotlinForForge)
+            mods.add(neoForge.mods[ModConstants.ID])
         }
     }
 }
 
-sourceSets.main.get().resources {
-    srcDir("src/generated/resources")
+dependencies {
+    implementation(apiSourceSet.output)
+    implementation(libs.kotlinForForge)
 }
 
-configurations.create("localRuntime").extendsFrom(configurations.runtimeClasspath.get())
+ModConstants.EXTENSIONS.forEach(::createModExtension)
 
 tasks.withType<ProcessResources>().configureEach {
     val replaceProperties: Map<String, String> = mapOf(
@@ -97,8 +108,6 @@ tasks.withType<ProcessResources>().configureEach {
     }
 }
 
-ModConstants.EXTENSIONS.forEach(::createModExtension)
-
 idea {
     module {
         isDownloadSources = true
@@ -107,11 +116,30 @@ idea {
 }
 
 fun createModExtension(name: String) {
-    val sourceSet = sourceSets.create(name)
-    val id = "${ModConstants.ID}_name"
+    val id = "${ModConstants.ID}_$name"
 
-    neoForge.mods.create(id) {
-        sourceSet(sourceSets.main.get())
+    val sourceSet = sourceSets.create(name) {
+        compileClasspath += apiSourceSet.output
+        resources {
+            srcDir("src/dataGen/${name}/resources")
+            exclude(".cache")
+        }
+    }
+
+    val mod = neoForge.mods.create(id) {
         sourceSet(sourceSet)
+    }
+
+    neoForge {
+        addModdingDependenciesTo(sourceSet)
+
+        runs["data"].programArguments.addAll(
+            "--mod", id,
+            "--existing", file("src/$name/resources/").absolutePath
+        )
+
+        runs.configureEach {
+            mods.add(mod)
+        }
     }
 }
