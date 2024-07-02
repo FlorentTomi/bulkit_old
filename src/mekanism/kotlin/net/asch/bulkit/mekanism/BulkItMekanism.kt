@@ -5,6 +5,7 @@ import mekanism.api.chemical.gas.Gas
 import mekanism.common.capabilities.Capabilities
 import net.asch.bulkit.BulkIt
 import net.asch.bulkit.common.ResourceHolder
+import net.asch.bulkit.mekanism.common.capability.disk.DiskContentGasHandler
 import net.asch.bulkit.mekanism.common.capability.disk.DiskGasHandler
 import net.asch.bulkit.mekanism.common.capability.drive_network.DriveNetworkViewGasHandler
 import net.neoforged.bus.api.IEventBus
@@ -25,6 +26,7 @@ object BulkItMekanism {
         MekanismAPI.GAS_REGISTRY,
         Capabilities.GAS.item,
         DiskGasHandler::createOnlyNonRadioactive,
+        DiskContentGasHandler::createOnlyNonRadioactive,
         Capabilities.GAS.block,
         DriveNetworkViewGasHandler::createOnlyNonRadioactive
     )
@@ -34,6 +36,7 @@ object BulkItMekanism {
         MekanismAPI.GAS_REGISTRY,
         Capabilities.GAS.item,
         DiskGasHandler::createOnlyRadioactive,
+        DiskContentGasHandler::createOnlyRadioactive,
         Capabilities.GAS.block,
         DriveNetworkViewGasHandler::createOnlyRadioactive
     )

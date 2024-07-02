@@ -9,6 +9,8 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import net.neoforged.neoforge.items.IItemHandler
 
 object Capabilities {
+    val DISK_CONTENT: ItemCapability<DiskContentHandler<*>, Void> =
+        ItemCapability.createVoid(BulkIt.location("disk_content"), DiskContentHandler::class.java)
     val DISK_MODS: ItemCapability<IItemHandler, Void> =
         ItemCapability.createVoid(BulkIt.location("disk_mods"), IItemHandler::class.java)
 

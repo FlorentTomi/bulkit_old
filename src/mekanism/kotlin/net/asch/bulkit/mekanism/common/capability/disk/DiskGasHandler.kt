@@ -11,6 +11,8 @@ import net.minecraft.world.item.ItemStack
 
 class DiskGasHandler(disk: ItemStack, private val filter: Filter) :
     DiskChemicalHandler<Gas, GasStack>(disk, resource(filter)), IGasHandler {
+    private val diskContent = disk.getCapability(resourceHolder.diskContentCapability)!!
+
     override fun toIdentifier(stack: GasStack): ResourceIdentifier<Gas> =
         ResourceIdentifier(stack.chemicalHolder, DataComponentPatch.EMPTY)
 
@@ -33,7 +35,7 @@ class DiskGasHandler(disk: ItemStack, private val filter: Filter) :
         fun createOnlyRadioactive(disk: ItemStack, ctx: Void): IGasHandler =
             DiskGasHandler(disk, Filter.ONLY_RADIOACTIVE)
 
-        fun resource(filter: Filter): ResourceHolder<Gas, IGasHandler, IGasHandler> = when (filter) {
+        fun resource(filter: Filter): ResourceHolder<Gas, IGasHandler, IGasHandler, *> = when (filter) {
             Filter.ALL -> TODO()
             Filter.ONLY_NON_RADIOACTIVE -> BulkItMekanism.RESOURCE_GAS_NON_RADIOACTIVE
             Filter.ONLY_RADIOACTIVE -> BulkItMekanism.RESOURCE_GAS_RADIOACTIVE
