@@ -3,13 +3,16 @@ bulkit = "0.1.0-alpha"
 minecraft = "1.21"
 kotlin-jvm = "2.0.0"
 neoforged-moddev = "0.1.99"
-neoforged-neoforge = "21.0.37-beta"
+neoforged-neoforge = "21.0.42-beta"
 parchment-mappings = "2024.06.23"
 parchment-minecraft = "1.21"
 kotlinForForge = "5.3.0"
+mekanism = "1.21-10.6.3.49"
 
 [libraries]
 kotlinForForge = { module = "thedarkcolour:kotlinforforge-neoforge", version.ref = "kotlinForForge" }
+mekanism_api = { module = "mekanism:Mekanism", name = "api", version.ref = "mekanism" }
+mekanism_core = { module = "mekanism:Mekanism", version.ref = "mekanism" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-jvm" }

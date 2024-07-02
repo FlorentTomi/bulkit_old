@@ -1,4 +1,4 @@
-package net.asch.bulkit.api
+package net.asch.bulkit.common.data
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder

@@ -1,12 +1,8 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    `java-library`
-    eclipse
-    idea
-
-    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.neoforged.moddev)
+    alias(libs.plugins.kotlin.jvm)
 }
 
 tasks.withType<Wrapper>().configureEach {
@@ -17,7 +13,18 @@ tasks.withType<Wrapper>().configureEach {
 repositories {
     mavenLocal()
     maven("https://thedarkcolour.github.io/KotlinForForge/")
+    maven("https://modmaven.dev/")
 }
+
+data class ExtensionDependencies(
+    val version: String,
+    val apiProvider: Provider<MinimalExternalModuleDependency>,
+    val runtimeProviders: List<Provider<MinimalExternalModuleDependency>>
+)
+
+val extensionDependencies = mapOf(
+    "mekanism" to ExtensionDependencies(libs.versions.mekanism.get(), libs.mekanism.api, listOf(libs.mekanism.core))
+)
 
 base.archivesName = ModConstants.ID
 
@@ -33,16 +40,12 @@ sourceSets {
     }
 }
 
-val apiSourceSet = sourceSets.create("api")
-
 neoForge {
     version = libs.versions.neoforged.neoforge
     parchment {
         mappingsVersion = libs.versions.parchment.mappings
         minecraftVersion = libs.versions.parchment.minecraft
     }
-
-    addModdingDependenciesTo(apiSourceSet)
 
     mods {
         create(ModConstants.ID) {
@@ -70,10 +73,13 @@ neoForge {
         create("data") {
             data()
             programArguments.addAll(
-                "--mod", ModConstants.ID,
+                "--mod",
+                ModConstants.ID,
                 "--all",
-                "--output", file("src/dataGen/").absolutePath,
-                "--existing", file("src/main/resources/").absolutePath
+                "--output",
+                file("src/dataGen/").absolutePath,
+                "--existing",
+                file("src/main/resources/").absolutePath
             )
         }
 
@@ -86,7 +92,6 @@ neoForge {
 }
 
 dependencies {
-    implementation(apiSourceSet.output)
     implementation(libs.kotlinForForge)
 }
 
@@ -98,9 +103,12 @@ tasks.withType<ProcessResources>().configureEach {
         "minecraft_version_range" to "[${libs.versions.minecraft.get()},)",
         "neo_version" to libs.versions.neoforged.neoforge.get(),
         "neo_version_range" to "[${libs.versions.neoforged.neoforge.get()},)",
+        "mod_version" to libs.versions.bulkit.get(),
         "mod_license" to ModConstants.LICENSE,
         "mod_authors" to ModConstants.AUTHORS
-    )
+    ) + extensionDependencies.map { (depName, dep) ->
+        "${depName}_version_range" to "[${dep.version},)"
+    }
 
     inputs.properties(replaceProperties)
     filesMatching(listOf("META-INF/neoforge.mods.toml")) {
@@ -119,23 +127,40 @@ fun createModExtension(name: String) {
     val id = "${ModConstants.ID}_$name"
 
     val sourceSet = sourceSets.create(name) {
-        compileClasspath += apiSourceSet.output
+        compileClasspath += sourceSets.main.get().output
         resources {
             srcDir("src/dataGen/${name}/resources")
             exclude(".cache")
         }
     }
 
+    sourceSets.main.get().runtimeClasspath += sourceSet.output
+
     val mod = neoForge.mods.create(id) {
         sourceSet(sourceSet)
+    }
+
+    val buildJar = tasks.register<Jar>(sourceSet.jarTaskName) {
+        group = "build"
+        archiveClassifier = name
+        from(sourceSet.output)
+    }
+    tasks.getByName("assemble").dependsOn(buildJar)
+
+    configurations.getByName("${name}Implementation").extendsFrom(configurations.implementation.get())
+
+    dependencies {
+        extensionDependencies[name]?.let { extDep ->
+            configurations.getByName("${name}CompileOnly")(extDep.apiProvider)
+            extDep.runtimeProviders.forEach { runtimeOnly(it) }
+        }
     }
 
     neoForge {
         addModdingDependenciesTo(sourceSet)
 
         runs["data"].programArguments.addAll(
-            "--mod", id,
-            "--existing", file("src/$name/resources/").absolutePath
+            "--mod", id, "--existing", file("src/$name/resources/").absolutePath
         )
 
         runs.configureEach {

@@ -4,7 +4,7 @@ license="${mod_license}"
 
 [[mods]]
 modId="bulkit"
-version="0.1.0-alpha"
+version="${mod_version}"
 displayName="BulkIt"
 authors="${mod_authors}"
 description=''''''
