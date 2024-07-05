@@ -2,6 +2,7 @@ package net.asch.bulkit.common.capability
 
 import net.asch.bulkit.BulkIt
 import net.asch.bulkit.common.block_entity.BlockEntities
+import net.asch.bulkit.common.capability.disk.DiskContentHandler
 import net.asch.bulkit.common.capability.drive_network.DriveNetworkHandler
 import net.neoforged.neoforge.capabilities.BlockCapability
 import net.neoforged.neoforge.capabilities.ItemCapability

@@ -1,19 +1,19 @@
 package net.asch.bulkit.common.capability.disk
 
 import net.asch.bulkit.BulkIt
-import net.asch.bulkit.common.capability.Capabilities
 import net.asch.bulkit.common.data.resource.identifier
 import net.asch.bulkit.common.data.resource.of
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.items.IItemHandler
 
 class DiskItemHandler(disk: ItemStack, ctx: Void) : IItemHandler {
-    private val diskContent = disk.getCapability(BulkIt.RESOURCE_ITEM.diskContentCapability)!!
+    private val diskContent = disk.getCapability(BulkIt.RESOURCE_ITEM.disk.contentHandler)!!
 
     override fun getSlots(): Int = 1
     override fun getStackInSlot(slot: Int): ItemStack = toStack()
     override fun getSlotLimit(slot: Int): Int = minOf(64, diskContent.capacity.toInt())
-    override fun isItemValid(slot: Int, stack: ItemStack): Boolean = diskContent.canInsertResource(stack.identifier())
+    override fun isItemValid(slot: Int, stack: ItemStack): Boolean =
+        DiskContentHandler.canInsertResource(diskContent.id, stack.identifier())
 
     override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean): ItemStack {
         if (stack.isEmpty) {
@@ -25,7 +25,8 @@ class DiskItemHandler(disk: ItemStack, ctx: Void) : IItemHandler {
         }
 
         val remainingCapacity = diskContent.capacity - diskContent.amount
-        val amountToInsert = if (!diskContent.void) minOf(remainingCapacity, stack.count.toLong()) else stack.count.toLong()
+        val amountToInsert =
+            if (!diskContent.void) minOf(remainingCapacity, stack.count.toLong()) else stack.count.toLong()
         if (amountToInsert == 0L) {
             return stack
         }

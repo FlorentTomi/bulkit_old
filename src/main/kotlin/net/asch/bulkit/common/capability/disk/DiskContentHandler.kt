@@ -1,6 +1,6 @@
-package net.asch.bulkit.common.capability
+package net.asch.bulkit.common.capability.disk
 
-import net.asch.bulkit.common.ResourceHolder
+import net.asch.bulkit.common.capability.Capabilities
 import net.asch.bulkit.common.data.DataComponents
 import net.asch.bulkit.common.data.ResourceIdentifier
 import net.asch.bulkit.common.item.mod.CapacityDowngradeMod
@@ -8,16 +8,7 @@ import net.asch.bulkit.common.item.mod.CapacityUpgradeMod
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 
-abstract class DiskContentHandler<R>(
-    private val disk: ItemStack, protected val resourceHolder: ResourceHolder<R, *, *, *>
-) {
-    var id: ResourceIdentifier<R>?
-        get() = disk.get(resourceHolder.id)
-        set(value) {
-            disk.set(resourceHolder.id, value)
-            amount = 0
-        }
-
+abstract class DiskContentHandler(protected val disk: ItemStack) {
     var amount: Long
         get() = disk.getOrDefault(DataComponents.Disk.AMOUNT, 0)
         set(value) {
@@ -40,8 +31,6 @@ abstract class DiskContentHandler<R>(
     abstract val capacity: Long
     abstract val description: Component
 
-    fun canInsertResource(resourceToInsert: ResourceIdentifier<R>): Boolean = (id == null) || (id == resourceToInsert)
-
     fun multiplier(defaultMultiplier: Int): Int {
         var multiplier = 1
         var hasDowngrade = false
@@ -62,5 +51,11 @@ abstract class DiskContentHandler<R>(
         }
 
         return multiplier
+    }
+
+    companion object {
+        fun <R> canInsertResource(
+            currentResource: ResourceIdentifier<R>?, resourceToInsert: ResourceIdentifier<R>?
+        ): Boolean = (currentResource == null) || (currentResource == resourceToInsert)
     }
 }

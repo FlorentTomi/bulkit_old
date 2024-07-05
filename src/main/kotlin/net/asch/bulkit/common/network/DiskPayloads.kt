@@ -36,12 +36,12 @@ object DiskPayloads {
         val mainHandItem = player.mainHandItem
         when (payload.type()) {
             AddItem.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(BulkIt.RESOURCE_ITEM.diskCapability)
+                val diskCapability = mainHandItem.getCapability(BulkIt.RESOURCE_ITEM.disk.resourceHandler)
                 diskCapability?.insertItem(0, (payload as AddItem).stack, false)
             }
 
             AddFluid.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(BulkIt.RESOURCE_FLUID.diskCapability)
+                val diskCapability = mainHandItem.getCapability(BulkIt.RESOURCE_FLUID.disk.resourceHandler)
                 diskCapability?.fill((payload as AddFluid).stack, IFluidHandler.FluidAction.EXECUTE)
             }
 

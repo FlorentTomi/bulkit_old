@@ -1,18 +1,16 @@
 package net.asch.bulkit.common.capability.disk
 
 import net.asch.bulkit.BulkIt
-import net.asch.bulkit.common.capability.DiskContentHandler
 import net.asch.bulkit.common.data.resource.identifier
 import net.asch.bulkit.common.data.resource.of
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.material.Fluid
 import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.FluidType
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem
 
 class DiskFluidHandler(private val disk: ItemStack, ctx: Void) : IFluidHandlerItem {
-    private val diskContent = disk.getCapability(BulkIt.RESOURCE_FLUID.diskContentCapability)!!
+    private val diskContent = disk.getCapability(BulkIt.RESOURCE_FLUID.disk.contentHandler)!!
 
     override fun getTanks(): Int = 1
     override fun getFluidInTank(tank: Int): FluidStack = toStack()

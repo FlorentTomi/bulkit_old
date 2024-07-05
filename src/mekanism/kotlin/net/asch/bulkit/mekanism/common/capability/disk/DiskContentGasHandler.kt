@@ -1,7 +1,7 @@
 package net.asch.bulkit.mekanism.common.capability.disk
 
 import mekanism.api.chemical.gas.Gas
-import net.asch.bulkit.common.capability.DiskContentHandler
+import net.asch.bulkit.common.capability.disk.DiskContentHandler
 import net.asch.bulkit.mekanism.common.capability.disk.DiskGasHandler.Filter
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
