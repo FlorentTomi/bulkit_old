@@ -1,21 +1,38 @@
 package net.asch.bulkit.common.capability.disk
 
-import net.asch.bulkit.BulkIt
-import net.asch.bulkit.common.data.resource.identifier
-import net.asch.bulkit.common.data.resource.of
+import net.asch.bulkit.BulkItCore
+import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.api.data.ResourceIdentifier
+import net.asch.bulkit.common.Resources
+import net.asch.bulkit.common.data.extensions.identifier
+import net.asch.bulkit.common.data.extensions.of
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.material.Fluid
 import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.FluidType
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem
 
-class DiskFluidHandler(private val disk: ItemStack, ctx: Void) : IFluidHandlerItem {
-    private val diskContent = disk.getCapability(BulkIt.RESOURCE_FLUID.disk.contentHandler)!!
+class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
+    private val resourceType = Resources.FLUID.get()
+    private val resource = disk.getCapability(BulkItCapabilities.Disk.RESOURCE)!!
+    private var id: ResourceIdentifier<Fluid>?
+        get() = disk.get(resourceType.resource)
+        set(value) {
+            disk.set(resourceType.resource, value)
+            resource.amount = 0
+        }
+
+    private val maxStackSize: Int
+        get() = toStack().getOrDefault(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1)
+    private val capacity: Long
+        get() = maxStackSize.toLong() * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
 
     override fun getTanks(): Int = 1
     override fun getFluidInTank(tank: Int): FluidStack = toStack()
-    override fun getTankCapacity(tank: Int): Int = minOf(FluidType.BUCKET_VOLUME, capacity().toInt())
-    override fun isFluidValid(tank: Int, stack: FluidStack): Boolean = diskContent.canInsertResource(stack.identifier())
+    override fun getTankCapacity(tank: Int): Int = minOf(FluidType.BUCKET_VOLUME, capacity.toInt())
+    override fun isFluidValid(tank: Int, stack: FluidStack): Boolean = (id == null) || (id == stack.identifier())
+
     override fun getContainer(): ItemStack = disk
 
     override fun fill(stack: FluidStack, action: IFluidHandler.FluidAction): Int {
@@ -27,22 +44,23 @@ class DiskFluidHandler(private val disk: ItemStack, ctx: Void) : IFluidHandlerIt
             return 0
         }
 
-        val remainingCapacity = capacity() - diskContent.amount
-        val amountToInsert = if (!diskContent.void) minOf(remainingCapacity, stack.amount.toLong()) else stack.amount.toLong()
+        val remainingCapacity = capacity - resource.amount
+        val amountToInsert =
+            if (!resource.void) minOf(remainingCapacity, stack.amount.toLong()) else stack.amount.toLong()
 
         if (!action.simulate()) {
-            if (diskContent.id == null) {
-                diskContent.id = stack.identifier()
+            if (id == null) {
+                id = stack.identifier()
             }
 
-            diskContent.amount = minOf(capacity(), diskContent.amount + amountToInsert)
+            resource.amount = minOf(capacity, resource.amount + amountToInsert)
         }
 
         return amountToInsert.toInt()
     }
 
     override fun drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack {
-        return if (diskContent.id == resource.identifier()) {
+        return if (id == resource.identifier()) {
             drain(resource.amount, action)
         } else {
             FluidStack.EMPTY
@@ -54,33 +72,33 @@ class DiskFluidHandler(private val disk: ItemStack, ctx: Void) : IFluidHandlerIt
             return FluidStack.EMPTY
         }
 
-        if (diskContent.id == null || diskContent.amount == 0L) {
+        if (id == null || resource.amount == 0L) {
             return FluidStack.EMPTY
         }
 
         val toExtract = minOf(amount, FluidType.BUCKET_VOLUME)
-        if (diskContent.amount <= toExtract) {
+        if (resource.amount <= toExtract) {
             val existing = toStack()
-            if (!action.simulate() && !diskContent.locked) {
-                diskContent.id = null
+            if (!action.simulate() && !resource.locked) {
+                id = null
             }
 
             return existing
         }
 
         if (!action.simulate()) {
-            diskContent.amount -= toExtract
+            resource.amount -= toExtract
         }
 
         return toStack(toExtract.toLong())
     }
 
-    private fun toStack(amount: Long): FluidStack = diskContent.id?.of(amount) ?: FluidStack.EMPTY
-    private fun toStack(): FluidStack = toStack(diskContent.amount)
-
-    private fun capacity(): Long = FluidType.BUCKET_VOLUME * diskContent.multiplier(DEFAULT_CAPACITY_MULTIPLIER).toLong()
+    private fun toStack(amount: Long): FluidStack = id?.of(amount) ?: FluidStack.EMPTY
+    private fun toStack(): FluidStack = toStack(resource.amount)
 
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER: Int = 32
+
+        fun build(stack: ItemStack, ctx: Void) = DiskFluidHandler(stack)
     }
 }

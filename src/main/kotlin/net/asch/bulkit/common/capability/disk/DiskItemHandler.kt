@@ -1,19 +1,34 @@
 package net.asch.bulkit.common.capability.disk
 
-import net.asch.bulkit.BulkIt
-import net.asch.bulkit.common.data.resource.identifier
-import net.asch.bulkit.common.data.resource.of
+import net.asch.bulkit.BulkItCore
+import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.api.data.ResourceIdentifier
+import net.asch.bulkit.common.Resources
+import net.asch.bulkit.common.data.extensions.identifier
+import net.asch.bulkit.common.data.extensions.of
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.items.IItemHandler
 
-class DiskItemHandler(disk: ItemStack, ctx: Void) : IItemHandler {
-    private val diskContent = disk.getCapability(BulkIt.RESOURCE_ITEM.disk.contentHandler)!!
+class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
+    private val resourceType = Resources.ITEM.get()
+    private val resource = disk.getCapability(BulkItCapabilities.Disk.RESOURCE)!!
+    private var id: ResourceIdentifier<Item>?
+        get() = disk.get(resourceType.resource)
+        set(value) {
+            disk.set(resourceType.resource, value)
+            resource.amount = 0
+        }
+
+    private val maxStackSize: Int
+        get() = toStack().getOrDefault(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1)
+    private val capacity: Long
+        get() = maxStackSize.toLong() * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
 
     override fun getSlots(): Int = 1
     override fun getStackInSlot(slot: Int): ItemStack = toStack()
-    override fun getSlotLimit(slot: Int): Int = minOf(64, diskContent.capacity.toInt())
-    override fun isItemValid(slot: Int, stack: ItemStack): Boolean =
-        DiskContentHandler.canInsertResource(diskContent.id, stack.identifier())
+    override fun getSlotLimit(slot: Int): Int = capacity.toInt()
+    override fun isItemValid(slot: Int, stack: ItemStack): Boolean = (id == null) || (id == stack.identifier())
 
     override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean): ItemStack {
         if (stack.isEmpty) {
@@ -24,50 +39,56 @@ class DiskItemHandler(disk: ItemStack, ctx: Void) : IItemHandler {
             return stack
         }
 
-        val remainingCapacity = diskContent.capacity - diskContent.amount
+        val remainingCapacity = capacity - resource.amount
         val amountToInsert =
-            if (!diskContent.void) minOf(remainingCapacity, stack.count.toLong()) else stack.count.toLong()
+            if (!resource.void) minOf(remainingCapacity, stack.count.toLong()) else stack.count.toLong()
         if (amountToInsert == 0L) {
             return stack
         }
 
         if (!simulate) {
-            if (diskContent.id == null) {
-                diskContent.id = stack.identifier()
+            if (id == null) {
+                id = stack.identifier()
             }
 
-            diskContent.amount = minOf(diskContent.capacity, diskContent.amount + amountToInsert)
+            resource.amount = minOf(capacity, resource.amount + amountToInsert)
         }
 
         return if (amountToInsert == stack.count.toLong()) ItemStack.EMPTY else stack.copyWithCount(amountToInsert.toInt())
     }
 
     override fun extractItem(slot: Int, amount: Int, simulate: Boolean): ItemStack {
-        if (diskContent.amount == 0L) {
+        if (resource.amount == 0L) {
             return ItemStack.EMPTY
         }
 
-        if (diskContent.id == null || amount == 0) {
+        if (id == null || amount == 0) {
             return ItemStack.EMPTY
         }
 
-        val toExtract = minOf(amount, diskContent.maxStackSize)
-        if (diskContent.amount <= toExtract) {
+        val toExtract = minOf(amount, maxStackSize)
+        if (resource.amount <= toExtract) {
             val existing = toStack()
-            if (!simulate && !diskContent.locked) {
-                diskContent.id = null
+            if (!simulate && !resource.locked) {
+                id = null
             }
 
             return existing
         }
 
         if (!simulate) {
-            diskContent.amount -= toExtract
+            resource.amount -= toExtract
         }
 
         return toStack(toExtract.toLong())
     }
 
-    private fun toStack(amount: Long): ItemStack = diskContent.id?.of(amount) ?: ItemStack.EMPTY
-    private fun toStack(): ItemStack = toStack(diskContent.amount)
+    private fun toStack(amount: Long): ItemStack = id?.of(amount) ?: ItemStack.EMPTY
+    private fun toStack(): ItemStack = toStack(resource.amount)
+
+    companion object {
+        private const val DEFAULT_CAPACITY_MULTIPLIER: Int = 8
+
+        fun build(stack: ItemStack, ctx: Void) = DiskItemHandler(stack)
+    }
 }

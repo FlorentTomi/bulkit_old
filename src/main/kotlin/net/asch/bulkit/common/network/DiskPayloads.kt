@@ -1,7 +1,9 @@
 package net.asch.bulkit.common.network
 
-import net.asch.bulkit.BulkIt
-import net.asch.bulkit.common.capability.Capabilities
+import net.asch.bulkit.BulkItCore
+import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.common.Resources
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
@@ -22,12 +24,12 @@ object DiskPayloads {
         registrar.playToServer(Void.TYPE, Void.STREAM_CODEC, ::handlePayload)
     }
 
-    fun addItem(stack: ItemStack) = BulkIt.sendToServer(AddItem(stack))
-    fun addFluid(stack: FluidStack) = BulkIt.sendToServer(AddFluid(stack))
-    fun grow(amount: Long) = BulkIt.sendToServer(Grow(amount))
-    fun shrink(amount: Long) = BulkIt.sendToServer(Shrink(amount))
-    fun lock(locked: Boolean) = BulkIt.sendToServer(Lock(locked))
-    fun void(void: Boolean) = BulkIt.sendToServer(Void(void))
+    fun addItem(stack: ItemStack) = BulkItCore.sendToServer(AddItem(stack))
+    fun addFluid(stack: FluidStack) = BulkItCore.sendToServer(AddFluid(stack))
+    fun grow(amount: Long) = BulkItCore.sendToServer(Grow(amount))
+    fun shrink(amount: Long) = BulkItCore.sendToServer(Shrink(amount))
+    fun lock(locked: Boolean) = BulkItCore.sendToServer(Lock(locked))
+    fun void(void: Boolean) = BulkItCore.sendToServer(Void(void))
 
     private inline fun <reified PayloadType : CustomPacketPayload> handlePayload(
         payload: PayloadType, context: IPayloadContext
@@ -36,32 +38,32 @@ object DiskPayloads {
         val mainHandItem = player.mainHandItem
         when (payload.type()) {
             AddItem.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(BulkIt.RESOURCE_ITEM.disk.resourceHandler)
+                val diskCapability = mainHandItem.getCapability(Resources.ITEM.get().diskCap)
                 diskCapability?.insertItem(0, (payload as AddItem).stack, false)
             }
 
             AddFluid.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(BulkIt.RESOURCE_FLUID.disk.resourceHandler)
+                val diskCapability = mainHandItem.getCapability(Resources.FLUID.get().diskCap)
                 diskCapability?.fill((payload as AddFluid).stack, IFluidHandler.FluidAction.EXECUTE)
             }
 
             Grow.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(Capabilities.DISK_CONTENT)
+                val diskCapability = mainHandItem.getCapability(BulkItCapabilities.Disk.RESOURCE)
                 diskCapability?.let { diskCapability.amount += (payload as Grow).amount }
             }
 
             Shrink.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(Capabilities.DISK_CONTENT)
+                val diskCapability = mainHandItem.getCapability(BulkItCapabilities.Disk.RESOURCE)
                 diskCapability?.let { diskCapability.amount -= (payload as Shrink).amount }
             }
 
             Lock.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(Capabilities.DISK_CONTENT)
+                val diskCapability = mainHandItem.getCapability(BulkItCapabilities.Disk.RESOURCE)
                 diskCapability?.locked = (payload as Lock).locked
             }
 
             Void.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(Capabilities.DISK_CONTENT)
+                val diskCapability = mainHandItem.getCapability(BulkItCapabilities.Disk.RESOURCE)
                 diskCapability?.void = (payload as Void).void
             }
         }

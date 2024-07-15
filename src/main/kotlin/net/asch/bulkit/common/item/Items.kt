@@ -1,6 +1,6 @@
 package net.asch.bulkit.common.item
 
-import net.asch.bulkit.BulkIt
+import net.asch.bulkit.api.BulkIt
 import net.asch.bulkit.common.item.mod.CapacityDowngradeMod
 import net.asch.bulkit.common.item.mod.CapacityUpgradeMod
 import net.neoforged.bus.api.IEventBus

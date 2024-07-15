@@ -1,6 +1,6 @@
-package net.asch.bulkit.common.data.resource
+package net.asch.bulkit.common.data.extensions
 
-import net.asch.bulkit.common.data.ResourceIdentifier
+import net.asch.bulkit.api.data.ResourceIdentifier
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 

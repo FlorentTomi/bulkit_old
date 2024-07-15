@@ -1,4 +1,4 @@
-package net.asch.bulkit.common.item
+package net.asch.bulkit.api.item
 
 import net.minecraft.world.item.Item
 

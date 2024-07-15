@@ -1,8 +1,8 @@
 package net.asch.bulkit.common.data
 
 import com.mojang.serialization.Codec
-import net.asch.bulkit.BulkIt
-import net.minecraft.core.Registry
+import net.asch.bulkit.BulkItCore
+import net.asch.bulkit.api.BulkIt
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.world.item.component.ItemContainerContents
@@ -37,12 +37,4 @@ object DataComponents {
     }
 
     fun register(eventBus: IEventBus) = REGISTER.register(eventBus)
-    fun <R> registerResource(
-        key: String, resourceRegistry: Registry<R>
-    ): DeferredHolder<DataComponentType<*>, DataComponentType<ResourceIdentifier<R>>> =
-        REGISTER.registerComponentType("${key}_id") {
-            BulkIt.logInfo("Registering ${resourceRegistry.key().registry()} resource")
-            DataComponentType.builder<ResourceIdentifier<R>>().persistent(ResourceIdentifier.codec(resourceRegistry))
-                .networkSynchronized(ResourceIdentifier.streamCodec(resourceRegistry)).cacheEncoding()
-        }
 }

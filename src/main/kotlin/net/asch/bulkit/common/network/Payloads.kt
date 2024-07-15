@@ -1,6 +1,6 @@
 package net.asch.bulkit.common.network
 
-import net.asch.bulkit.BulkIt
+import net.asch.bulkit.api.BulkIt
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
 
 object Payloads {

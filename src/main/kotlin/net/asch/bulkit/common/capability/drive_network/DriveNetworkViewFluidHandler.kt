@@ -1,29 +1,36 @@
 package net.asch.bulkit.common.capability.drive_network
 
+import net.asch.bulkit.BulkItCore
+import net.asch.bulkit.common.Resources
+import net.asch.bulkit.common.block.DriveNetworkView
+import net.asch.bulkit.common.capability.Capabilities
+import net.minecraft.core.Direction
 import net.minecraft.world.level.block.entity.BlockEntity
-import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.fluids.FluidStack
-import net.neoforged.neoforge.fluids.FluidType
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem
 
-class DriveNetworkViewFluidHandler<C>(blockEntity: BlockEntity, ctx: C) :
-    DriveNetworkViewStorage<IFluidHandlerItem>(blockEntity, Capabilities.FluidHandler.ITEM), IFluidHandler {
+class DriveNetworkViewFluidHandler(blockEntity: BlockEntity) : IFluidHandler {
+    private val resourceType = Resources.FLUID.get()
+    private val nSlots = blockEntity.blockState.getValue(DriveNetworkView.N_SLOTS_STATE)
+    private val link: DriveNetworkLink? = blockEntity.level?.getCapability(
+        Capabilities.DRIVE_NETWORK_LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, null
+    )
+
     override fun getTanks(): Int = nSlots
 
     override fun getFluidInTank(tank: Int): FluidStack =
-        execute(tank, IFluidHandlerItem::getFluidInTank, FluidStack.EMPTY)
+        link?.disk(tank)?.getCapability(resourceType.diskCap)?.getFluidInTank(0) ?: FluidStack.EMPTY
 
     override fun getTankCapacity(tank: Int): Int =
-        execute(tank, IFluidHandlerItem::getTankCapacity, FluidType.BUCKET_VOLUME)
+        link?.disk(tank)?.getCapability(resourceType.diskCap)?.getTankCapacity(0) ?: 0
 
     override fun isFluidValid(tank: Int, stack: FluidStack): Boolean =
-        execute(tank, IFluidHandlerItem::isFluidValid, false, stack)
+        link?.disk(tank)?.getCapability(resourceType.diskCap)?.isFluidValid(0, stack) ?: false
 
     override fun fill(stack: FluidStack, action: IFluidHandler.FluidAction): Int {
         val remainingStack = stack.copy()
-        forEach<IFluidHandlerItem>(Capabilities.FluidHandler.ITEM) {
-            val filledAmount = it.fill(remainingStack, action)
+        for (tank in 0 until nSlots) {
+            val filledAmount = link?.disk(tank)?.getCapability(resourceType.diskCap)?.fill(remainingStack, action) ?: 0
             remainingStack.shrink(filledAmount)
         }
 
@@ -33,17 +40,19 @@ class DriveNetworkViewFluidHandler<C>(blockEntity: BlockEntity, ctx: C) :
     override fun drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack {
         val resourceToDrain = resource.copy()
         var drainedStack = FluidStack.EMPTY
-        forEach<IFluidHandlerItem>(Capabilities.FluidHandler.ITEM) {
+        for (tank in 0 until nSlots) {
             if (resourceToDrain.isEmpty) {
-                return@forEach
+                break
             }
 
-            val drained = it.drain(resourceToDrain, action)
+            val drained = link?.disk(tank)?.getCapability(resourceType.diskCap)?.drain(resourceToDrain, action)
+                ?: FluidStack.EMPTY
             if (drainedStack.isEmpty) {
                 drainedStack = drained.copy()
             } else {
                 drainedStack.grow(drained.amount)
             }
+
             resourceToDrain.shrink(drained.amount)
         }
 
@@ -52,16 +61,18 @@ class DriveNetworkViewFluidHandler<C>(blockEntity: BlockEntity, ctx: C) :
 
     override fun drain(amount: Int, action: IFluidHandler.FluidAction): FluidStack {
         var drainedStack = FluidStack.EMPTY
-        forEach<IFluidHandlerItem>(Capabilities.FluidHandler.ITEM) {
+        for (tank in 0 until nSlots) {
             if (drainedStack.amount == amount) {
-                return@forEach
+                break
             }
 
             if (drainedStack.isEmpty) {
-                drainedStack = it.drain(amount, action)
+                drainedStack =
+                    link?.disk(tank)?.getCapability(resourceType.diskCap)?.drain(amount, action) ?: FluidStack.EMPTY
             } else {
                 val toDrain = drainedStack.copyWithAmount(amount - drainedStack.amount)
-                val drained = it.drain(toDrain, action)
+                val drained =
+                    link?.disk(tank)?.getCapability(resourceType.diskCap)?.drain(toDrain, action) ?: FluidStack.EMPTY
                 if (!drained.isEmpty) {
                     drainedStack.grow(drained.amount)
                 }
@@ -69,5 +80,9 @@ class DriveNetworkViewFluidHandler<C>(blockEntity: BlockEntity, ctx: C) :
         }
 
         return drainedStack
+    }
+
+    companion object {
+        fun build(blockEntity: BlockEntity, ctx: Direction?) = DriveNetworkViewFluidHandler(blockEntity)
     }
 }

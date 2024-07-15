@@ -31,6 +31,7 @@ base.archivesName = ModConstants.ID
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 kotlin.compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
 
+val apiSourceSet = sourceSets.create("api")
 sourceSets {
     main {
         resources {
@@ -47,8 +48,11 @@ neoForge {
         minecraftVersion = libs.versions.parchment.minecraft
     }
 
+    addModdingDependenciesTo(apiSourceSet)
+
     mods {
         create(ModConstants.ID) {
+            sourceSet(apiSourceSet)
             sourceSet(sourceSets.main.get())
         }
     }
@@ -93,6 +97,7 @@ neoForge {
 
 dependencies {
     implementation(libs.kotlinForForge)
+    compileOnly(apiSourceSet.output)
 }
 
 ModConstants.EXTENSIONS.forEach(::createModExtension)
@@ -137,6 +142,7 @@ fun createModExtension(name: String) {
     sourceSets.main.get().runtimeClasspath += sourceSet.output
 
     val mod = neoForge.mods.create(id) {
+        sourceSet(apiSourceSet)
         sourceSet(sourceSet)
     }
 
@@ -147,9 +153,10 @@ fun createModExtension(name: String) {
     }
     tasks.getByName("assemble").dependsOn(buildJar)
 
-    configurations.getByName("${name}Implementation").extendsFrom(configurations.implementation.get())
-
     dependencies {
+        configurations.getByName("${name}Implementation")(libs.kotlinForForge)
+        configurations.getByName("${name}CompileOnly")(apiSourceSet.output)
+
         extensionDependencies[name]?.let { extDep ->
             configurations.getByName("${name}CompileOnly")(extDep.apiProvider)
             extDep.runtimeProviders.forEach { runtimeOnly(it) }

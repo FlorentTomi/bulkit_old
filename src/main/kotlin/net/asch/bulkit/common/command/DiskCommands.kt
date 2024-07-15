@@ -7,14 +7,13 @@ import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import net.asch.bulkit.BulkIt
-import net.asch.bulkit.common.capability.Capabilities
+import net.asch.bulkit.BulkItCore
+import net.asch.bulkit.api.BulkIt
 import net.asch.bulkit.common.network.DiskPayloads
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemInput
-import net.minecraft.network.chat.Component
 
 object DiskCommands {
     fun register(dispatcher: CommandDispatcher<CommandSourceStack>, buildContext: CommandBuildContext) {
@@ -34,24 +33,22 @@ object DiskCommands {
         )
 
     private fun print(context: CommandContext<CommandSourceStack>): Int {
-        val disk = context.source.player?.mainHandItem ?: return -1
-        val diskCapability = disk.getCapability(Capabilities.DISK_CONTENT) ?: return -1
-        val msg = if (diskCapability.id == null) {
-            Component.literal("empty")
-        } else {
-            Component.empty().append(diskCapability.description)
-                .append(": ${diskCapability.amount} / ${diskCapability.capacity}")
-        }
+//        val disk = context.source.player?.mainHandItem ?: return -1
+//        val diskCapability = disk.getCapability(Capabilities.DISK_RESOURCE) ?: return -1
+//        val msg = Component.empty().append(diskCapability.description)
+//            .append(": ${diskCapability.amount} / ${diskCapability.capacity}")
 
 //        BulkIt.sendMessageTo(context.source.player!!, msg)
         return 0
     }
 
     private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenLock(builder: ArgumentBuilder<CommandSourceStack, T>) =
-        builder.then(LiteralArgumentBuilder.literal<CommandSourceStack>("lock").requires { it.hasPermission(2) }.then(
-            RequiredArgumentBuilder.argument<CommandSourceStack, Boolean>("locked", BoolArgumentType.bool())
-                .executes(::lock)
-        ))
+        builder.then(
+            LiteralArgumentBuilder.literal<CommandSourceStack>("lock").requires { it.hasPermission(2) }.then(
+                RequiredArgumentBuilder.argument<CommandSourceStack, Boolean>("locked", BoolArgumentType.bool())
+                    .executes(::lock)
+            )
+        )
 
     private fun lock(context: CommandContext<CommandSourceStack>): Int {
         val locked = BoolArgumentType.getBool(context, "locked")
@@ -60,10 +57,12 @@ object DiskCommands {
     }
 
     private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenVoid(builder: ArgumentBuilder<CommandSourceStack, T>) =
-        builder.then(LiteralArgumentBuilder.literal<CommandSourceStack>("void").requires { it.hasPermission(2) }.then(
-            RequiredArgumentBuilder.argument<CommandSourceStack, Boolean>("void", BoolArgumentType.bool())
-                .executes(::void)
-        ))
+        builder.then(
+            LiteralArgumentBuilder.literal<CommandSourceStack>("void").requires { it.hasPermission(2) }.then(
+                RequiredArgumentBuilder.argument<CommandSourceStack, Boolean>("void", BoolArgumentType.bool())
+                    .executes(::void)
+            )
+        )
 
     private fun void(context: CommandContext<CommandSourceStack>): Int {
         val void = BoolArgumentType.getBool(context, "void")
@@ -74,17 +73,18 @@ object DiskCommands {
     private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenAdd(
         builder: ArgumentBuilder<CommandSourceStack, T>, buildContext: CommandBuildContext
     ) {
-        builder.then(LiteralArgumentBuilder.literal<CommandSourceStack>("add").requires { it.hasPermission(2) }.then(
-            LiteralArgumentBuilder.literal<CommandSourceStack>("item").then(
-                RequiredArgumentBuilder.argument<CommandSourceStack, ItemInput>(
-                    "item", ItemArgument.item(buildContext)
-                ).then(
-                    RequiredArgumentBuilder.argument<CommandSourceStack, Int>(
-                        "amount", IntegerArgumentType.integer(0)
-                    ).executes(::addItem)
+        builder.then(
+            LiteralArgumentBuilder.literal<CommandSourceStack>("add").requires { it.hasPermission(2) }.then(
+                LiteralArgumentBuilder.literal<CommandSourceStack>("item").then(
+                    RequiredArgumentBuilder.argument<CommandSourceStack, ItemInput>(
+                        "item", ItemArgument.item(buildContext)
+                    ).then(
+                        RequiredArgumentBuilder.argument<CommandSourceStack, Int>(
+                            "amount", IntegerArgumentType.integer(0)
+                        ).executes(::addItem)
+                    )
                 )
             )
-        )
 //            .then(
 //            LiteralArgumentBuilder.literal<CommandSourceStack>("fluid").then(
 //                RequiredArgumentBuilder.argument<CommandSourceStack, FluidInput>(
@@ -116,10 +116,12 @@ object DiskCommands {
 //    }
 
     private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenGrow(builder: ArgumentBuilder<CommandSourceStack, T>) =
-        builder.then(LiteralArgumentBuilder.literal<CommandSourceStack>("grow").requires { it.hasPermission(2) }.then(
-            RequiredArgumentBuilder.argument<CommandSourceStack, Int>("amount", IntegerArgumentType.integer(0))
-                .executes(::grow)
-        ))
+        builder.then(
+            LiteralArgumentBuilder.literal<CommandSourceStack>("grow").requires { it.hasPermission(2) }.then(
+                RequiredArgumentBuilder.argument<CommandSourceStack, Int>("amount", IntegerArgumentType.integer(0))
+                    .executes(::grow)
+            )
+        )
 
     private fun grow(context: CommandContext<CommandSourceStack>): Int {
         val amount = IntegerArgumentType.getInteger(context, "amount")
@@ -128,10 +130,12 @@ object DiskCommands {
     }
 
     private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenShrink(builder: ArgumentBuilder<CommandSourceStack, T>) =
-        builder.then(LiteralArgumentBuilder.literal<CommandSourceStack>("shrink").requires { it.hasPermission(2) }.then(
-            RequiredArgumentBuilder.argument<CommandSourceStack, Int>("amount", IntegerArgumentType.integer(0))
-                .executes(::shrink)
-        ))
+        builder.then(
+            LiteralArgumentBuilder.literal<CommandSourceStack>("shrink").requires { it.hasPermission(2) }.then(
+                RequiredArgumentBuilder.argument<CommandSourceStack, Int>("amount", IntegerArgumentType.integer(0))
+                    .executes(::shrink)
+            )
+        )
 
     private fun shrink(context: CommandContext<CommandSourceStack>): Int {
         val amount = IntegerArgumentType.getInteger(context, "amount")

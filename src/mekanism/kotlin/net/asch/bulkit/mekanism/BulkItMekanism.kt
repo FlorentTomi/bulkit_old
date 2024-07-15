@@ -1,13 +1,7 @@
 package net.asch.bulkit.mekanism
 
-import mekanism.api.MekanismAPI
-import mekanism.api.chemical.gas.Gas
-import mekanism.common.capabilities.Capabilities
-import net.asch.bulkit.BulkIt
-import net.asch.bulkit.common.ResourceHolder
-import net.asch.bulkit.mekanism.common.capability.disk.DiskContentGasHandler
-import net.asch.bulkit.mekanism.common.capability.disk.DiskGasHandler
-import net.asch.bulkit.mekanism.common.capability.drive_network.DriveNetworkViewGasHandler
+import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.mekanism.common.Resources
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
@@ -18,30 +12,11 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 object BulkItMekanism {
     const val ID = "${BulkIt.ID}_mekanism"
 
-    private val DATA_COMPONENTS = DeferredRegister.createDataComponents(ID)
-    private val ITEMS = DeferredRegister.createItems(ID)
-
-    val RESOURCE_GAS_NON_RADIOACTIVE = ResourceHolder.Builder<Gas>(DATA_COMPONENTS, ITEMS).build(
-        "gas_non_radioactive",
-        MekanismAPI.GAS_REGISTRY,
-        Capabilities.GAS.item,
-        DiskGasHandler::createOnlyNonRadioactive,
-        DiskContentGasHandler::createOnlyNonRadioactive,
-        Capabilities.GAS.block,
-        DriveNetworkViewGasHandler::createOnlyNonRadioactive
-    )
-
-    val RESOURCE_GAS_RADIOACTIVE = ResourceHolder.Builder<Gas>(DATA_COMPONENTS, ITEMS).build(
-        "gas_non_radioactive",
-        MekanismAPI.GAS_REGISTRY,
-        Capabilities.GAS.item,
-        DiskGasHandler::createOnlyRadioactive,
-        DiskContentGasHandler::createOnlyRadioactive,
-        Capabilities.GAS.block,
-        DriveNetworkViewGasHandler::createOnlyRadioactive
-    )
+    val DATA_COMPONENTS: DeferredRegister.DataComponents = DeferredRegister.createDataComponents(ID)
+    val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(ID)
 
     init {
+        BulkIt.logDebug("${BulkIt.ID} extension: mekanism")
         val eventBus = MOD_BUS
         eventBus.addListener(RegisterCapabilitiesEvent::class.java, ::registerCapabilities)
         register(eventBus)
@@ -50,10 +25,19 @@ object BulkItMekanism {
     private fun register(eventBus: IEventBus) {
         ITEMS.register(eventBus)
         DATA_COMPONENTS.register(eventBus)
+        Resources.register(eventBus)
     }
 
     private fun registerCapabilities(event: RegisterCapabilitiesEvent) {
-        RESOURCE_GAS_NON_RADIOACTIVE.registerCapabilities(event)
-        RESOURCE_GAS_RADIOACTIVE.registerCapabilities(event)
+    }
+
+    enum class GasFilter {
+        ALL, ONLY_NON_RADIOACTIVE, ONLY_RADIOACTIVE
+    }
+
+    fun gasResource(filter: GasFilter) = when (filter) {
+        GasFilter.ALL -> TODO()
+        GasFilter.ONLY_NON_RADIOACTIVE -> Resources.GAS_NON_RADIOACTIVE
+        GasFilter.ONLY_RADIOACTIVE -> Resources.GAS_RADIOACTIVE
     }
 }
