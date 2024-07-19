@@ -1,7 +1,7 @@
 package net.asch.bulkit.common.capability.drive_network
 
-import net.asch.bulkit.api.block.BulkItBlockStates
-import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.api.block.DriveNetworkViewBase
+import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.api.capability.IDriveNetworkLink
 import net.asch.bulkit.common.Resources
 import net.minecraft.core.Direction
@@ -11,9 +11,9 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler
 
 class DriveNetworkViewFluidHandler(blockEntity: BlockEntity) : IFluidHandler {
     private val resourceType = Resources.FLUID.get()
-    private val nSlots = blockEntity.blockState.getValue(BulkItBlockStates.DriveNetworkView.N_SLOTS_STATE)
+    private val nSlots = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val link: IDriveNetworkLink? = blockEntity.level?.getCapability(
-        BulkItCapabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, null
+        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, null
     )
 
     override fun getTanks(): Int = nSlots

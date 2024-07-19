@@ -10,8 +10,7 @@ base.archivesName = modId
 repositories {
     mavenLocal()
     maven("https://thedarkcolour.github.io/KotlinForForge/")
-
-    maven("https://repo.repsy.io/mvn/asch/main")
+//    maven("https://repo.repsy.io/mvn/asch/main")
 }
 
 neoForge {
@@ -68,6 +67,5 @@ setupResourceProcessing(project)
 
 dependencies {
     implementation(libs.kotlinForForge)
-    compileOnly("bulkit:api:0.1.0-alpha")
-//    compileOnly(project(":api"))
+    implementation(project(":api"))
 }

@@ -1,7 +1,7 @@
 package net.asch.bulkit.common.block
 
 import net.asch.bulkit.api.BulkIt
-import net.asch.bulkit.api.block.BulkItBlockStates
+import net.asch.bulkit.api.block.DriveNetworkViewBase
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.neoforge.registries.DeferredBlock
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -11,7 +11,7 @@ object Blocks {
 
     val DISK_DRIVE: DeferredBlock<DiskDrive> = register.register("disk_drive") { -> DiskDrive() }
 
-    val DRIVE_NETWORK_VIEWS = BulkItBlockStates.DriveNetworkView.AVAILABLE_SIZES.associateWith { size ->
+    val DRIVE_NETWORK_VIEWS = DriveNetworkViewBase.AVAILABLE_SIZES.associateWith { size ->
         register.register("drive_network_view_$size") { -> DriveNetworkView(size) }
     }
 

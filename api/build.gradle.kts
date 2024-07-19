@@ -3,21 +3,12 @@ plugins {
     `maven-publish`
 }
 
-repositories {
-    mavenLocal()
-    maven("https://thedarkcolour.github.io/KotlinForForge/")
-}
-
 neoForge {
     version = libs.versions.neoforged.neoforge
     parchment {
         mappingsVersion = libs.versions.parchment.mappings
         minecraftVersion = libs.versions.parchment.minecraft
     }
-}
-
-dependencies {
-    implementation(libs.kotlinForForge)
 }
 
 publishing {

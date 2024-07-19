@@ -1,7 +1,7 @@
 package net.asch.bulkit.common.capability
 
 import net.asch.bulkit.api.BulkIt
-import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.common.block_entity.BlockEntities
 import net.asch.bulkit.common.capability.drive_network.DriveNetworkLink
 import net.asch.bulkit.common.data.Attachments
@@ -22,7 +22,7 @@ object Capabilities {
 
         }
         event.registerBlockEntity(
-            BulkItCapabilities.DriveNetwork.LINK, BlockEntities.DRIVE_NETWORK_VIEW.get(), DriveNetworkLink::build
+            Capabilities.DriveNetwork.LINK, BlockEntities.DRIVE_NETWORK_VIEW.get(), DriveNetworkLink::build
         )
     }
 

@@ -20,6 +20,12 @@ neoForge {
         minecraftVersion = libs.versions.parchment.minecraft
     }
 
+    mods {
+        create(modId) {
+            sourceSet(sourceSets.main.get())
+        }
+    }
+
     runs {
         create("client") {
             client()
@@ -59,14 +65,10 @@ neoForge {
 
 setupResourceProcessing(project, "mekanism_version_range" to "[${libs.versions.mekanism.get()},)")
 
-val localRuntime: Configuration = configurations.create("localRuntime")
-configurations.runtimeClasspath.configure {
-    extendsFrom(localRuntime)
-}
-
 dependencies {
     implementation(libs.kotlinForForge)
     compileOnly(project(":api"))
     compileOnly(libs.mekanism.api)
-    localRuntime(libs.mekanism.core)
+    configurations.getByName("localRuntime")(libs.mekanism.core)
+    configurations.getByName("localRuntime")(project(":core"))
 }

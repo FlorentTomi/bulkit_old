@@ -3,8 +3,8 @@ package net.asch.bulkit.mekanism.common.capability.drive_network
 import mekanism.api.Action
 import mekanism.api.chemical.gas.GasStack
 import mekanism.api.chemical.gas.IGasHandler
-import net.asch.bulkit.api.block.BulkItBlockStates
-import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.api.block.DriveNetworkViewBase
+import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.api.capability.IDriveNetworkLink
 import net.asch.bulkit.mekanism.BulkItMekanism
 import net.minecraft.core.Direction
@@ -12,9 +12,9 @@ import net.minecraft.world.level.block.entity.BlockEntity
 
 class DriveNetworkViewGasHandler(blockEntity: BlockEntity, filter: BulkItMekanism.GasFilter) : IGasHandler {
     private val resourceType = BulkItMekanism.gasResource(filter).get()
-    private val nSlots = blockEntity.blockState.getValue(BulkItBlockStates.DriveNetworkView.N_SLOTS_STATE)
+    private val nSlots = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val link: IDriveNetworkLink? = blockEntity.level?.getCapability(
-        BulkItCapabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, null
+        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, null
     )
 
     override fun getTanks(): Int = nSlots

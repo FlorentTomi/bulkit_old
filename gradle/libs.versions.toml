@@ -1,5 +1,8 @@
 [versions]
 bulkit = "0.1.0-alpha"
+bulkit-api = "0.1.0-alpha"
+bulkit-mekanism = "0.1.0-alpha"
+
 minecraft = "1.21"
 kotlin-jvm = "2.0.0"
 neoforged-moddev = "0.1.99"
@@ -11,8 +14,9 @@ mekanism = "1.21-10.6.5.52"
 
 [libraries]
 kotlinForForge = { module = "thedarkcolour:kotlinforforge-neoforge", version.ref = "kotlinForForge" }
-mekanism_api = { module = "mekanism:Mekanism", name = "api", version.ref = "mekanism" }
-mekanism_core = { module = "mekanism:Mekanism", version.ref = "mekanism" }
+mekanism-api = { module = "mekanism:Mekanism", name = "api", version.ref = "mekanism" }
+mekanism-core = { module = "mekanism:Mekanism", version.ref = "mekanism" }
+bulkit-api = { module = "bulkit:api", version.ref = "bulkit" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-jvm" }

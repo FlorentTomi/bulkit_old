@@ -1,7 +1,6 @@
 package net.asch.bulkit.common.capability.disk
 
-import net.asch.bulkit.BulkItCore
-import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.api.data.ResourceIdentifier
 import net.asch.bulkit.common.Resources
 import net.asch.bulkit.common.data.extensions.identifier
@@ -15,12 +14,12 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem
 
 class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
     private val resourceType = Resources.FLUID.get()
-    private val resource = disk.getCapability(BulkItCapabilities.Disk.RESOURCE)!!
+    private val resource = disk.getCapability(Capabilities.Disk.RESOURCE)!!
     private var id: ResourceIdentifier<Fluid>?
         get() = disk.get(resourceType.resource)
         set(value) {
             disk.set(resourceType.resource, value)
-            resource.amount = 0
+            resource.amount = 0;
         }
 
     private val maxStackSize: Int
@@ -46,7 +45,7 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
 
         val remainingCapacity = capacity - resource.amount
         val amountToInsert =
-            if (!resource.void) minOf(remainingCapacity, stack.amount.toLong()) else stack.amount.toLong()
+            if (!resource.isVoidExcess) minOf(remainingCapacity, stack.amount.toLong()) else stack.amount.toLong()
 
         if (!action.simulate()) {
             if (id == null) {
@@ -79,7 +78,7 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
         val toExtract = minOf(amount, FluidType.BUCKET_VOLUME)
         if (resource.amount <= toExtract) {
             val existing = toStack()
-            if (!action.simulate() && !resource.locked) {
+            if (!action.simulate() && !resource.isLocked) {
                 id = null
             }
 

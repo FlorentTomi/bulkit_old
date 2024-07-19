@@ -1,7 +1,7 @@
 package net.asch.bulkit.common.capability.disk
 
 import net.asch.bulkit.BulkItCore
-import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.api.data.ResourceIdentifier
 import net.asch.bulkit.common.Resources
 import net.asch.bulkit.common.data.extensions.identifier
@@ -12,7 +12,7 @@ import net.neoforged.neoforge.items.IItemHandler
 
 class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
     private val resourceType = Resources.ITEM.get()
-    private val resource = disk.getCapability(BulkItCapabilities.Disk.RESOURCE)!!
+    private val resource = disk.getCapability(Capabilities.Disk.RESOURCE)!!
     private var id: ResourceIdentifier<Item>?
         get() = disk.get(resourceType.resource)
         set(value) {
@@ -41,7 +41,7 @@ class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
 
         val remainingCapacity = capacity - resource.amount
         val amountToInsert =
-            if (!resource.void) minOf(remainingCapacity, stack.count.toLong()) else stack.count.toLong()
+            if (!resource.isVoidExcess) minOf(remainingCapacity, stack.count.toLong()) else stack.count.toLong()
         if (amountToInsert == 0L) {
             return stack
         }
@@ -69,7 +69,7 @@ class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
         val toExtract = minOf(amount, maxStackSize)
         if (resource.amount <= toExtract) {
             val existing = toStack()
-            if (!simulate && !resource.locked) {
+            if (!simulate && !resource.isLocked) {
                 id = null
             }
 

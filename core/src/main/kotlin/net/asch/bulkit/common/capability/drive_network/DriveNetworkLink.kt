@@ -1,8 +1,7 @@
 package net.asch.bulkit.common.capability.drive_network
 
-import net.asch.bulkit.api.block.BulkItBlockStates
+import net.asch.bulkit.api.block.DriveNetworkViewBase
 import net.asch.bulkit.api.capability.IDriveNetworkLink
-import net.asch.bulkit.common.block.DriveNetworkView
 import net.asch.bulkit.common.data.Attachments
 import net.asch.bulkit.common.data.delegate.AttachmentDelegate
 import net.asch.bulkit.common.data.delegate.DefaultedAttachmentDelegate
@@ -14,7 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntity
 
 class DriveNetworkLink(blockEntity: BlockEntity) : IDriveNetworkLink {
     private val level: Level? = blockEntity.level
-    private val nSlots: Int = blockEntity.blockState.getValue(BulkItBlockStates.DriveNetworkView.N_SLOTS_STATE)
+    private val nSlots: Int = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val emptySlots: List<Int> = emptySlotMapping(nSlots)
     private var rootPosition: BlockPos? by AttachmentDelegate(blockEntity, Attachments.DriveNetworkView.ROOT_POS)
     private var slotMapping: MutableList<Int> by DefaultedAttachmentDelegate(

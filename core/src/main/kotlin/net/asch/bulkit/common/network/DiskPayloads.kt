@@ -2,7 +2,7 @@ package net.asch.bulkit.common.network
 
 import net.asch.bulkit.BulkItCore
 import net.asch.bulkit.api.BulkIt
-import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.common.Resources
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
@@ -48,23 +48,23 @@ object DiskPayloads {
             }
 
             Grow.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(BulkItCapabilities.Disk.RESOURCE)
+                val diskCapability = mainHandItem.getCapability(Capabilities.Disk.RESOURCE)
                 diskCapability?.let { diskCapability.amount += (payload as Grow).amount }
             }
 
             Shrink.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(BulkItCapabilities.Disk.RESOURCE)
+                val diskCapability = mainHandItem.getCapability(Capabilities.Disk.RESOURCE)
                 diskCapability?.let { diskCapability.amount -= (payload as Shrink).amount }
             }
 
             Lock.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(BulkItCapabilities.Disk.RESOURCE)
-                diskCapability?.locked = (payload as Lock).locked
+                val diskCapability = mainHandItem.getCapability(Capabilities.Disk.RESOURCE)
+                diskCapability?.isLocked = (payload as Lock).locked
             }
 
             Void.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(BulkItCapabilities.Disk.RESOURCE)
-                diskCapability?.void = (payload as Void).void
+                val diskCapability = mainHandItem.getCapability(Capabilities.Disk.RESOURCE)
+                diskCapability?.isVoidExcess = (payload as Void).void
             }
         }
     }

@@ -6,17 +6,19 @@ import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import net.neoforged.neoforge.registries.DeferredRegister
+import org.apache.logging.log4j.LogManager
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 
 @Mod(BulkItMekanism.ID)
 object BulkItMekanism {
     const val ID = "${BulkIt.ID}_mekanism"
+    val LOGGER = LogManager.getLogger()
 
     val DATA_COMPONENTS: DeferredRegister.DataComponents = DeferredRegister.createDataComponents(ID)
     val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(ID)
 
     init {
-        BulkIt.logDebug("${BulkIt.ID} extension: mekanism")
+        LOGGER.debug("${BulkIt.ID} extension: mekanism")
         val eventBus = MOD_BUS
         eventBus.addListener(RegisterCapabilitiesEvent::class.java, ::registerCapabilities)
         register(eventBus)

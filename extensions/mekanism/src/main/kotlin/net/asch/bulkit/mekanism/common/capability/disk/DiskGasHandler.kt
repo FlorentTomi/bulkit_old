@@ -4,7 +4,7 @@ import mekanism.api.Action
 import mekanism.api.chemical.gas.Gas
 import mekanism.api.chemical.gas.GasStack
 import mekanism.api.chemical.gas.IGasHandler
-import net.asch.bulkit.api.capability.BulkItCapabilities
+import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.api.data.ResourceIdentifier
 import net.asch.bulkit.mekanism.BulkItMekanism
 import net.minecraft.core.component.DataComponentPatch
@@ -13,7 +13,7 @@ import net.neoforged.neoforge.fluids.FluidType
 
 class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMekanism.GasFilter) : IGasHandler {
     private val resourceType = BulkItMekanism.gasResource(filter).get()
-    private val resource = disk.getCapability(BulkItCapabilities.Disk.RESOURCE)!!
+    private val resource = disk.getCapability(Capabilities.Disk.RESOURCE)!!
     private var id: ResourceIdentifier<Gas>?
         get() = disk.get(resourceType.resource)
         set(value) {
@@ -40,7 +40,7 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
         }
 
         val remainingCapacity = capacity - resource.amount
-        val amountToInsert = if (!resource.void) minOf(remainingCapacity, stack.amount) else stack.amount
+        val amountToInsert = if (!resource.isVoidExcess) minOf(remainingCapacity, stack.amount) else stack.amount
         if (amountToInsert == 0L) {
             return stack
         }
@@ -68,7 +68,7 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
         val toExtract = minOf(amount, FluidType.BUCKET_VOLUME.toLong())
         if (resource.amount <= toExtract) {
             val existing = toStack()
-            if (!action.simulate() && !resource.locked) {
+            if (!action.simulate() && !resource.isLocked) {
                 id = null
             }
 
