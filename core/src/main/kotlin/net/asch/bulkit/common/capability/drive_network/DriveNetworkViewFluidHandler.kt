@@ -9,11 +9,11 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
 
-class DriveNetworkViewFluidHandler(blockEntity: BlockEntity) : IFluidHandler {
+class DriveNetworkViewFluidHandler(blockEntity: BlockEntity, direction: Direction) : IFluidHandler {
     private val resourceType = Resources.FLUID.get()
     private val nSlots = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val link: IDriveNetworkLink? = blockEntity.level?.getCapability(
-        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, null
+        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, direction
     )
 
     override fun getTanks(): Int = nSlots
@@ -83,6 +83,6 @@ class DriveNetworkViewFluidHandler(blockEntity: BlockEntity) : IFluidHandler {
     }
 
     companion object {
-        fun build(blockEntity: BlockEntity, ctx: Direction?) = DriveNetworkViewFluidHandler(blockEntity)
+        fun build(blockEntity: BlockEntity, direction: Direction) = DriveNetworkViewFluidHandler(blockEntity, direction)
     }
 }

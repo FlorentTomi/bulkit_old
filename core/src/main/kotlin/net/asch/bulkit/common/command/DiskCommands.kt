@@ -31,6 +31,7 @@ object DiskCommands {
             LiteralArgumentBuilder.literal<CommandSourceStack>("print").executes(::print)
         )
 
+    @Suppress("UNUSED_PARAMETER")
     private fun print(context: CommandContext<CommandSourceStack>): Int {
 //        val disk = context.source.player?.mainHandItem ?: return -1
 //        val diskCapability = disk.getCapability(Capabilities.DISK_RESOURCE) ?: return -1

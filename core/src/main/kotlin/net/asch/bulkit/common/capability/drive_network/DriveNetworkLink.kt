@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 
-class DriveNetworkLink(blockEntity: BlockEntity) : IDriveNetworkLink {
+class DriveNetworkLink(blockEntity: BlockEntity, private val direction: Direction) : IDriveNetworkLink {
     private val level: Level? = blockEntity.level
     private val nSlots: Int = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val emptySlots: List<Int> = emptySlotMapping(nSlots)
@@ -27,14 +27,12 @@ class DriveNetworkLink(blockEntity: BlockEntity) : IDriveNetworkLink {
     }
 
     override fun linkTo(blockPos: BlockPos?) {
-        if ((blockPos != null) && (level?.getBlockEntity(blockPos)
-                ?.hasData(Attachments.DRIVE_NETWORK_DISK_STORAGE) != true)
-        ) {
-            return
+        blockPos?.let {
+            if (level?.getBlockEntity(it)?.hasData(Attachments.DRIVE_NETWORK_DISK_STORAGE) == true) {
+                rootPosition = it
+                slotMapping = emptySlots.toMutableList()
+            }
         }
-
-        rootPosition = blockPos
-        slotMapping = emptySlots.toMutableList()
     }
 
     override fun disk(slot: Int): ItemStack {
@@ -53,6 +51,7 @@ class DriveNetworkLink(blockEntity: BlockEntity) : IDriveNetworkLink {
         private fun emptySlotMapping(size: Int): MutableList<Int> =
             MutableList(size) { IDriveNetworkLink.UNMAPPED_SLOT }
 
-        fun build(blockEntity: BlockEntity, ctx: Direction?): IDriveNetworkLink = DriveNetworkLink(blockEntity)
+        fun build(blockEntity: BlockEntity, direction: Direction): IDriveNetworkLink =
+            DriveNetworkLink(blockEntity, direction)
     }
 }

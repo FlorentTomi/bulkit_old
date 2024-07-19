@@ -9,11 +9,11 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.neoforged.neoforge.items.IItemHandler
 
-class DriveNetworkViewItemHandler(blockEntity: BlockEntity) : IItemHandler {
+class DriveNetworkViewItemHandler(blockEntity: BlockEntity, direction: Direction) : IItemHandler {
     private val resourceType = Resources.ITEM.get()
     private val nSlots = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val link: IDriveNetworkLink? = blockEntity.level?.getCapability(
-        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, null
+        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, direction
     )
 
     override fun getSlots(): Int = nSlots
@@ -34,6 +34,6 @@ class DriveNetworkViewItemHandler(blockEntity: BlockEntity) : IItemHandler {
         link?.disk(slot)?.getCapability(resourceType.diskCap)?.isItemValid(0, stack) ?: false
 
     companion object {
-        fun build(blockEntity: BlockEntity, ctx: Direction?) = DriveNetworkViewItemHandler(blockEntity)
+        fun build(blockEntity: BlockEntity, direction: Direction) = DriveNetworkViewItemHandler(blockEntity, direction)
     }
 }

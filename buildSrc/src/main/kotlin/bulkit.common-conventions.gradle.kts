@@ -16,9 +16,5 @@ BulkIt.setup(project)
 
 project.tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(jvmTarget)
-}
-
-val localRuntime = project.configurations.create("localRuntime")
-configurations.getByName("runtimeClasspath") {
-    extendsFrom(localRuntime)
+    kotlinOptions.allWarningsAsErrors = true
 }

@@ -88,7 +88,5 @@ class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
 
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER: Int = 8
-
-        fun build(stack: ItemStack, ctx: Void) = DiskItemHandler(stack)
     }
 }

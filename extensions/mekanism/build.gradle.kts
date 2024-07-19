@@ -7,12 +7,6 @@ plugins {
 val modId = "bulkit-mekanism"
 base.archivesName = modId
 
-repositories {
-    mavenLocal()
-    maven("https://thedarkcolour.github.io/KotlinForForge/")
-    maven("https://modmaven.dev/")
-}
-
 neoForge {
     version = libs.versions.neoforged.neoforge
     parchment {

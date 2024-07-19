@@ -52,6 +52,7 @@ object BulkItCore {
         DeferredResources.register(event)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun onLoadComplete(event: FMLLoadCompleteEvent) {
         val registeredResources = DeferredResources.registeredResources()
 

@@ -3,6 +3,7 @@ package net.asch.plugin
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import java.time.Instant
@@ -22,6 +23,18 @@ object BulkIt {
         project.archivesName.set(subproject.modId)
         project.version = versionCatalog.version(subproject.modId)
         println("${project.name}: ${project.version}")
+
+        if (project.name != "api") {
+            val localRuntime = project.configurations.create("localRuntime")
+            project.configurations.getByName("runtimeClasspath") {
+                extendsFrom(localRuntime)
+            }
+
+            project.dependencies {
+                project.configurations.getByName("compileOnly")(versionCatalog.bundle("extra-api"))
+                localRuntime(versionCatalog.bundle("extra-runtime"))
+            }
+        }
 
         project.tasks.withType<Jar> {
             duplicatesStrategy = DuplicatesStrategy.FAIL

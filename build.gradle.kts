@@ -1,5 +1,4 @@
 plugins {
-    alias(libs.plugins.neoforged.moddev) apply false
     idea
 }
 

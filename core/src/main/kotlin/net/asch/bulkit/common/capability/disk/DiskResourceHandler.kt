@@ -54,8 +54,4 @@ class DiskResourceHandler(private val disk: ItemStack) : IDiskResourceHandler {
 
         return multiplier
     }
-
-    companion object {
-        fun build(stack: ItemStack, ctx: Void): IDiskResourceHandler = DiskResourceHandler(stack)
-    }
 }

@@ -15,9 +15,9 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries
 object Attachments {
     private val register = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, BulkIt.ID)
 
-    val DRIVE_NETWORK_DISK_STORAGE: DeferredHolder<AttachmentType<*>, AttachmentType<ItemStackHandler>> =
+    val DRIVE_NETWORK_DISK_STORAGE: DeferredHolder<AttachmentType<*>, AttachmentType<DiskHandler>> =
         register.register("drive_network_disk_storage") { ->
-            AttachmentType.serializable { -> DiskHandler() as ItemStackHandler }.build()
+            AttachmentType.serializable { -> DiskHandler() }.build()
         }
 
     fun register(eventBus: IEventBus) = register.register(eventBus)
@@ -34,7 +34,7 @@ object Attachments {
             }
     }
 
-    private class DiskHandler : ItemStackHandler(DISK_STORAGE_SIZE) {
+    class DiskHandler : ItemStackHandler(DISK_STORAGE_SIZE) {
         override fun isItemValid(slot: Int, stack: ItemStack): Boolean {
             return super.isItemValid(slot, stack) && (stack.item is Disk)
         }

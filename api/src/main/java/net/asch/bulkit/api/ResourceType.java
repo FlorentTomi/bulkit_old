@@ -44,8 +44,7 @@ public record ResourceType<T, DH, BH, BC>(String key,
         private BlockCapability<BH, BC> driveNetworkViewCap;
         private ICapabilityProvider<BlockEntity, BC, BH> driveNetworkViewCapProvider;
 
-        public Builder(String key, DeferredRegister.DataComponents dataComponents,
-                DeferredRegister.Items items) {
+        public Builder(String key, DeferredRegister.DataComponents dataComponents, DeferredRegister.Items items) {
             this.key = key;
             this.dataComponents = dataComponents;
             this.items = items;
@@ -57,7 +56,7 @@ public record ResourceType<T, DH, BH, BC>(String key,
         }
 
         public Builder<T, DH, BH, BC> defaultDisk() {
-            return disk((props) -> new Disk());
+            return disk((props) -> new Disk(props.stacksTo(16)));
         }
 
         public Builder<T, DH, BH, BC> disk(Function<Item.Properties, Disk> sup) {

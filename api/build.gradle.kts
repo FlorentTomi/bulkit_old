@@ -24,7 +24,6 @@ publishing {
 
     publications {
         register<MavenPublication>("mavenApi") {
-//            from(components["java"])
             artifact(tasks.sourcesJar)
         }
     }

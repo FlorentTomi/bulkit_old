@@ -10,6 +10,7 @@ class VersionCatalog(project: Project) {
     private val versionCatalog = project.extensions.getByType<VersionCatalogsExtension>().named("libs")
 
     fun alias(name: String): String = versionCatalog.findPlugin(name).get().get().pluginId
+    fun bundle(name: String) = versionCatalog.findBundle(name).get()
     fun version(name: String): String = versionCatalog.findVersion(name).get().requiredVersion
 }
 
