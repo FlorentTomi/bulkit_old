@@ -10,11 +10,12 @@ import net.asch.bulkit.mekanism.BulkItMekanism
 import net.minecraft.core.Direction
 import net.minecraft.world.level.block.entity.BlockEntity
 
-class DriveNetworkViewGasHandler(blockEntity: BlockEntity, filter: BulkItMekanism.GasFilter) : IGasHandler {
+class DriveNetworkViewGasHandler(blockEntity: BlockEntity, filter: BulkItMekanism.GasFilter, direction: Direction) :
+    IGasHandler {
     private val resourceType = BulkItMekanism.gasResource(filter).get()
     private val nSlots = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val link: IDriveNetworkLink? = blockEntity.level?.getCapability(
-        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, null
+        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, direction
     )
 
     override fun getTanks(): Int = nSlots
@@ -38,10 +39,10 @@ class DriveNetworkViewGasHandler(blockEntity: BlockEntity, filter: BulkItMekanis
     }
 
     companion object {
-        fun buildOnlyNonRadioactive(blockEntity: BlockEntity, ctx: Direction?): IGasHandler =
-            DriveNetworkViewGasHandler(blockEntity, BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE)
+        fun buildOnlyNonRadioactive(blockEntity: BlockEntity, ctx: Direction): IGasHandler =
+            DriveNetworkViewGasHandler(blockEntity, BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE, ctx)
 
-        fun buildOnlyRadioactive(blockEntity: BlockEntity, ctx: Direction?): IGasHandler =
-            DriveNetworkViewGasHandler(blockEntity, BulkItMekanism.GasFilter.ONLY_RADIOACTIVE)
+        fun buildOnlyRadioactive(blockEntity: BlockEntity, ctx: Direction): IGasHandler =
+            DriveNetworkViewGasHandler(blockEntity, BulkItMekanism.GasFilter.ONLY_RADIOACTIVE, ctx)
     }
 }

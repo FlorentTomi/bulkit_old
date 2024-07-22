@@ -104,9 +104,11 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER = 32
 
+        @Suppress("UNUSED_PARAMETER")
         fun buildOnlyNonRadioactive(disk: ItemStack, ctx: Void): IGasHandler =
             DiskGasHandler(disk, BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE)
 
+        @Suppress("UNUSED_PARAMETER")
         fun buildOnlyRadioactive(disk: ItemStack, ctx: Void): IGasHandler =
             DiskGasHandler(disk, BulkItMekanism.GasFilter.ONLY_RADIOACTIVE)
     }

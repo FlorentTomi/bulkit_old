@@ -1,9 +1,9 @@
 package net.asch.bulkit.common
 
 import net.asch.bulkit.api.BulkIt
-import net.asch.bulkit.api.DeferredResources
-import net.asch.bulkit.api.ResourceType
 import net.asch.bulkit.api.capability.Capabilities
+import net.asch.bulkit.api.registry.DeferredResources
+import net.asch.bulkit.api.registry.ResourceType
 import net.asch.bulkit.common.block_entity.BlockEntities
 import net.asch.bulkit.common.capability.disk.DiskFluidHandler
 import net.asch.bulkit.common.capability.disk.DiskItemHandler
@@ -15,6 +15,8 @@ import net.asch.bulkit.common.data.DataComponents
 import net.asch.bulkit.common.item.Items
 import net.minecraft.core.Direction
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters
+import net.minecraft.world.item.CreativeModeTab.Output
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.material.Fluid
 import net.neoforged.bus.api.IEventBus
@@ -25,7 +27,8 @@ import net.neoforged.neoforge.items.IItemHandler
 import net.neoforged.neoforge.registries.DeferredHolder
 
 object Resources {
-    private val REGISTER: DeferredResources = DeferredResources(BulkIt.ID)
+    private val REGISTER: DeferredResources =
+        DeferredResources(BulkIt.ID)
 
     val ITEM: DeferredHolder<ResourceType<*, *, *, *>, ResourceType<Item, IItemHandler, IItemHandler, Direction>> =
         REGISTER.registerResourceType(
@@ -66,5 +69,11 @@ object Resources {
             )
             it.registerDriveNetworkViewCapability(event, BlockEntities.DRIVE_NETWORK_VIEW.get())
         }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    fun registerToCreativeTab(params: ItemDisplayParameters, output: Output) {
+        output.accept(ITEM.get().disk)
+        output.accept(FLUID.get().disk)
     }
 }

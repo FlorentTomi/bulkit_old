@@ -1,5 +1,6 @@
-package net.asch.bulkit.api;
+package net.asch.bulkit.api.registry;
 
+import net.asch.bulkit.api.BulkIt;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.registries.DeferredHolder;

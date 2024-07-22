@@ -1,9 +1,10 @@
-package net.asch.bulkit.api;
+package net.asch.bulkit.api.registry;
 
 import net.asch.bulkit.api.data.ResourceIdentifier;
 import net.asch.bulkit.api.item.Disk;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,6 +32,10 @@ public record ResourceType<T, DH, BH, BC>(String key,
 
     public <BE extends BlockEntity> void registerDriveNetworkViewCapability(RegisterCapabilitiesEvent event, BlockEntityType<BE> blockEntityType) {
         event.registerBlockEntity(driveNetworkViewCap, blockEntityType, driveNetworkViewCapProvider);
+    }
+
+    public void registerToCreativeTab(CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
+        output.accept(disk);
     }
 
     public static class Builder<T, DH, BH, BC> implements Supplier<ResourceType<T, DH, BH, BC>> {
