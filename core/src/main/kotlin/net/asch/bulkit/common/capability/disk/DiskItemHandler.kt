@@ -1,7 +1,7 @@
 package net.asch.bulkit.common.capability.disk
 
-import net.asch.bulkit.BulkItCore
 import net.asch.bulkit.api.capability.Capabilities
+import net.asch.bulkit.api.capability.IDiskResourceHandler
 import net.asch.bulkit.api.data.ResourceIdentifier
 import net.asch.bulkit.common.Resources
 import net.asch.bulkit.common.data.extensions.identifier
@@ -14,16 +14,16 @@ class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
     private val resourceType = Resources.ITEM.get()
     private val resource = disk.getCapability(Capabilities.Disk.RESOURCE)!!
     private var id: ResourceIdentifier<Item>?
-        get() = disk.get(resourceType.resource)
+        get() = disk.get(resourceType.id)
         set(value) {
-            disk.set(resourceType.resource, value)
+            disk.set(resourceType.id, value)
             resource.amount = 0
         }
 
     private val maxStackSize: Int
-        get() = toStack().getOrDefault(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1)
+        get() = id?.resource?.value()?.defaultMaxStackSize ?: 0
     private val capacity: Long
-        get() = maxStackSize.toLong() * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
+        get() = capacity(maxStackSize, resource).toLong()
 
     override fun getSlots(): Int = 1
     override fun getStackInSlot(slot: Int): ItemStack = toStack()
@@ -39,6 +39,7 @@ class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
             return stack
         }
 
+        val capacity = if (id == null) capacity(stack, resource).toLong() else this.capacity
         val remainingCapacity = capacity - resource.amount
         val amountToInsert =
             if (!resource.isVoidExcess) minOf(remainingCapacity, stack.count.toLong()) else stack.count.toLong()
@@ -69,8 +70,12 @@ class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
         val toExtract = minOf(amount, maxStackSize)
         if (resource.amount <= toExtract) {
             val existing = toStack()
-            if (!simulate && !resource.isLocked) {
-                id = null
+            if (!simulate) {
+                if (!resource.isLocked) {
+                    id = null
+                } else {
+                    resource.amount = 0
+                }
             }
 
             return existing
@@ -88,5 +93,10 @@ class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
 
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER: Int = 8
+
+        fun capacity(maxStackSize: Int, resource: IDiskResourceHandler): Int =
+            maxStackSize * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
+
+        fun capacity(stack: ItemStack, resource: IDiskResourceHandler): Int = capacity(stack.maxStackSize, resource)
     }
 }

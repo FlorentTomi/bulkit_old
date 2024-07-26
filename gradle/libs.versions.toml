@@ -12,6 +12,7 @@ parchment-minecraft = "1.21"
 kotlinForForge = "5.4.0"
 mekanism = "1.21-10.6.5.52"
 jei = "19.5.0.40"
+junit-jupiter = "5.7.1"
 
 [libraries]
 kotlinForForge = { module = "thedarkcolour:kotlinforforge-neoforge", version.ref = "kotlinForForge" }
@@ -20,6 +21,9 @@ mekanism-core = { module = "mekanism:Mekanism", version.ref = "mekanism" }
 jei-api-common = { module = "mezz.jei:jei-1.21-common-api", version.ref = "jei" }
 jei-api-neoforge = { module = "mezz.jei:jei-1.21-neoforge-api", version.ref = "jei" }
 jei-neoforge = { module = "mezz.jei:jei-1.21-neoforge", version.ref = "jei" }
+neoforge-testFramework = { module = "net.neoforged:testframework", version.ref = "neoforged-neoforge" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+junitPlatform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-jvm" }
@@ -28,3 +32,5 @@ neoforged-moddev = { id = "net.neoforged.moddev", version.ref = "neoforged-modde
 [bundles]
 extra-api = ["jei-api-common", "jei-api-neoforge"]
 extra-runtime = ["jei-neoforge"]
+test-impl = ["junit-jupiter", "neoforge-testFramework"]
+test-runtime = ["junitPlatform-launcher"]

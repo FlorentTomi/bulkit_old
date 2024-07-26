@@ -5,6 +5,7 @@ import mekanism.api.chemical.gas.Gas
 import mekanism.api.chemical.gas.GasStack
 import mekanism.api.chemical.gas.IGasHandler
 import net.asch.bulkit.api.capability.Capabilities
+import net.asch.bulkit.api.capability.IDiskResourceHandler
 import net.asch.bulkit.api.data.ResourceIdentifier
 import net.asch.bulkit.mekanism.BulkItMekanism
 import net.minecraft.core.component.DataComponentPatch
@@ -15,16 +16,14 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
     private val resourceType = BulkItMekanism.gasResource(filter).get()
     private val resource = disk.getCapability(Capabilities.Disk.RESOURCE)!!
     private var id: ResourceIdentifier<Gas>?
-        get() = disk.get(resourceType.resource)
+        get() = disk.get(resourceType.id)
         set(value) {
-            disk.set(resourceType.resource, value)
+            disk.set(resourceType.id, value)
             resource.amount = 0
         }
 
-    private val maxStackSize: Int
-        get() = FluidType.BUCKET_VOLUME
     private val capacity: Long
-        get() = maxStackSize.toLong() * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
+        get() = capacity(resource).toLong()
 
     override fun getTanks(): Int = 1
     override fun getChemicalInTank(tank: Int): GasStack = toStack()
@@ -45,7 +44,7 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
             return stack
         }
 
-        if (!action.simulate()) {
+        if (action.execute()) {
             if (id == null) {
                 id = toIdentifier(stack)
             }
@@ -68,14 +67,18 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
         val toExtract = minOf(amount, FluidType.BUCKET_VOLUME.toLong())
         if (resource.amount <= toExtract) {
             val existing = toStack()
-            if (!action.simulate() && !resource.isLocked) {
-                id = null
+            if (action.execute()) {
+                if (!resource.isLocked) {
+                    id = null
+                } else {
+                    resource.amount = 0
+                }
             }
 
             return existing
         }
 
-        if (!action.simulate()) {
+        if (action.execute()) {
             resource.amount -= toExtract
         }
 
@@ -88,12 +91,11 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
         }
     }
 
-    override fun isValid(tank: Int, stack: GasStack): Boolean =
-        (id == null) || (id == toIdentifier(stack)) && when (filter) {
-            BulkItMekanism.GasFilter.ALL -> true
-            BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE -> !stack.isRadioactive
-            BulkItMekanism.GasFilter.ONLY_RADIOACTIVE -> stack.isRadioactive
-        }
+    override fun isValid(tank: Int, stack: GasStack): Boolean = when (filter) {
+        BulkItMekanism.GasFilter.ALL -> true
+        BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE -> !stack.isRadioactive
+        BulkItMekanism.GasFilter.ONLY_RADIOACTIVE -> stack.isRadioactive
+    }
 
     private fun toIdentifier(stack: GasStack): ResourceIdentifier<Gas> =
         ResourceIdentifier(stack.chemicalHolder, DataComponentPatch.EMPTY)
@@ -104,12 +106,13 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER = 32
 
-        @Suppress("UNUSED_PARAMETER")
-        fun buildOnlyNonRadioactive(disk: ItemStack, ctx: Void): IGasHandler =
+        fun capacity(resource: IDiskResourceHandler): Int =
+            FluidType.BUCKET_VOLUME * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
+
+        fun buildOnlyNonRadioactive(disk: ItemStack): IGasHandler =
             DiskGasHandler(disk, BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE)
 
-        @Suppress("UNUSED_PARAMETER")
-        fun buildOnlyRadioactive(disk: ItemStack, ctx: Void): IGasHandler =
+        fun buildOnlyRadioactive(disk: ItemStack): IGasHandler =
             DiskGasHandler(disk, BulkItMekanism.GasFilter.ONLY_RADIOACTIVE)
     }
 }

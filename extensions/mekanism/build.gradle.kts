@@ -14,10 +14,8 @@ neoForge {
         minecraftVersion = libs.versions.parchment.minecraft
     }
 
-    mods {
-        create(modId) {
-            sourceSet(sourceSets.main.get())
-        }
+    val mod = mods.create(modId) {
+        sourceSet(sourceSets.main.get())
     }
 
     runs {
@@ -55,6 +53,15 @@ neoForge {
             logLevel = org.slf4j.event.Level.DEBUG
         }
     }
+
+    unitTest {
+        enable()
+        testedMod = mod
+    }
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
 }
 
 setupResourceProcessing(project, "mekanism_version_range" to "[${libs.versions.mekanism.get()},)")
@@ -65,4 +72,11 @@ dependencies {
     compileOnly(libs.mekanism.api)
     configurations.getByName("localRuntime")(libs.mekanism.core)
     configurations.getByName("localRuntime")(project(":core"))
+
+    testCompileOnly(project(":api"))
+    testCompileOnly(libs.mekanism.api)
+    testImplementation(libs.bundles.test.impl)
+    testRuntimeOnly(libs.bundles.test.runtime)
+    testRuntimeOnly(libs.mekanism.core)
+    testRuntimeOnly(project(":core"))
 }

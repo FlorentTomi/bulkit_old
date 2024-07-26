@@ -14,10 +14,8 @@ neoForge {
         minecraftVersion = libs.versions.parchment.minecraft
     }
 
-    mods {
-        create(modId) {
-            sourceSet(sourceSets.main.get())
-        }
+    val mod = mods.create(modId) {
+        sourceSet(sourceSets.main.get())
     }
 
     runs {
@@ -55,6 +53,15 @@ neoForge {
             logLevel = org.slf4j.event.Level.DEBUG
         }
     }
+
+    unitTest {
+        enable()
+        testedMod = mod
+    }
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
 }
 
 setupResourceProcessing(project)
@@ -62,4 +69,7 @@ setupResourceProcessing(project)
 dependencies {
     implementation(libs.kotlinForForge)
     implementation(project(":api"))
+
+    testImplementation(libs.bundles.test.impl)
+    testRuntimeOnly(libs.bundles.test.runtime)
 }

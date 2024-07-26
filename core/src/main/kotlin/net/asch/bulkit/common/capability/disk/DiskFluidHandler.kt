@@ -1,6 +1,7 @@
 package net.asch.bulkit.common.capability.disk
 
 import net.asch.bulkit.api.capability.Capabilities
+import net.asch.bulkit.api.capability.IDiskResourceHandler
 import net.asch.bulkit.api.data.ResourceIdentifier
 import net.asch.bulkit.common.Resources
 import net.asch.bulkit.common.data.extensions.identifier
@@ -16,16 +17,14 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
     private val resourceType = Resources.FLUID.get()
     private val resource = disk.getCapability(Capabilities.Disk.RESOURCE)!!
     private var id: ResourceIdentifier<Fluid>?
-        get() = disk.get(resourceType.resource)
+        get() = disk.get(resourceType.id)
         set(value) {
-            disk.set(resourceType.resource, value)
+            disk.set(resourceType.id, value)
             resource.amount = 0;
         }
 
-    private val maxStackSize: Int
-        get() = toStack().getOrDefault(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1)
     private val capacity: Long
-        get() = maxStackSize.toLong() * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
+        get() = capacity(resource).toLong()
 
     override fun getTanks(): Int = 1
     override fun getFluidInTank(tank: Int): FluidStack = toStack()
@@ -47,7 +46,7 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
         val amountToInsert =
             if (!resource.isVoidExcess) minOf(remainingCapacity, stack.amount.toLong()) else stack.amount.toLong()
 
-        if (!action.simulate()) {
+        if (action.execute()) {
             if (id == null) {
                 id = stack.identifier()
             }
@@ -78,14 +77,18 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
         val toExtract = minOf(amount, FluidType.BUCKET_VOLUME)
         if (resource.amount <= toExtract) {
             val existing = toStack()
-            if (!action.simulate() && !resource.isLocked) {
-                id = null
+            if (action.execute()) {
+                if (!resource.isLocked) {
+                    id = null
+                } else {
+                    resource.amount = 0
+                }
             }
 
             return existing
         }
 
-        if (!action.simulate()) {
+        if (action.execute()) {
             resource.amount -= toExtract
         }
 
@@ -97,5 +100,8 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
 
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER: Int = 32
+
+        fun capacity(resource: IDiskResourceHandler): Int =
+            FluidType.BUCKET_VOLUME * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
     }
 }

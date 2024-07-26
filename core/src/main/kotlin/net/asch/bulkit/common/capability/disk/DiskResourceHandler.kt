@@ -10,9 +10,9 @@ import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.items.IItemHandler
 
 class DiskResourceHandler(private val disk: ItemStack) : IDiskResourceHandler {
-    private var thisAmount: Long by DefaultedComponentDelegate(disk, DataComponents.Disk.AMOUNT, 0L)
-    private var thisLocked: Boolean by DefaultedComponentDelegate(disk, DataComponents.Disk.LOCKED, true)
-    private var thisVoid: Boolean by DefaultedComponentDelegate(disk, DataComponents.Disk.VOID, false)
+    private var thisAmount: Long by DefaultedComponentDelegate(disk, DataComponents.DISK_AMOUNT, 0L)
+    private var thisLocked: Boolean by DefaultedComponentDelegate(disk, DataComponents.DISK_LOCKED, false)
+    private var thisVoid: Boolean by DefaultedComponentDelegate(disk, DataComponents.DISK_VOID, false)
     private val thisMods: IItemHandler?
         get() = disk.getCapability(Capabilities.Disk.MODS)
 

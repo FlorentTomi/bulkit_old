@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public record ResourceType<T, DH, BH, BC>(String key,
-                                          DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> resource,
+                                          DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> id,
                                           DeferredItem<Disk> disk, ItemCapability<DH, Void> diskCap,
                                           ICapabilityProvider<ItemStack, Void, DH> diskCapProvider,
                                           BlockCapability<BH, BC> driveNetworkViewCap,
@@ -42,7 +42,7 @@ public record ResourceType<T, DH, BH, BC>(String key,
         final String key;
         private final DeferredRegister.DataComponents dataComponents;
         private final DeferredRegister.Items items;
-        private DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> resource;
+        private DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> id;
         private DeferredItem<Disk> disk;
         private ItemCapability<DH, Void> diskCap;
         private ICapabilityProvider<ItemStack, Void, DH> diskCapProvider;
@@ -56,7 +56,7 @@ public record ResourceType<T, DH, BH, BC>(String key,
         }
 
         public Builder<T, DH, BH, BC> registry(Registry<T> registry) {
-            resource = dataComponents.registerComponentType("resource_" + key, (builder) -> builder.persistent(ResourceIdentifier.codec(registry)).networkSynchronized(ResourceIdentifier.streamCodec(registry)).cacheEncoding());
+            id = dataComponents.registerComponentType("resource_" + key, (builder) -> builder.persistent(ResourceIdentifier.codec(registry)).networkSynchronized(ResourceIdentifier.streamCodec(registry)).cacheEncoding());
             return this;
         }
 
@@ -83,7 +83,7 @@ public record ResourceType<T, DH, BH, BC>(String key,
 
         @Override
         public ResourceType<T, DH, BH, BC> get() {
-            return new ResourceType<>(key, resource, disk, diskCap, diskCapProvider, driveNetworkViewCap, driveNetworkViewCapProvider);
+            return new ResourceType<>(key, id, disk, diskCap, diskCapProvider, driveNetworkViewCap, driveNetworkViewCapProvider);
         }
     }
 }
