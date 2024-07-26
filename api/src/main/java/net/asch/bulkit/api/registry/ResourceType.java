@@ -16,16 +16,17 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public record ResourceType<T, DH, BH, BC>(String key,
                                           DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> id,
-                                          DeferredItem<Disk> disk, ItemCapability<DH, Void> diskCap,
-                                          ICapabilityProvider<ItemStack, Void, DH> diskCapProvider,
-                                          BlockCapability<BH, BC> driveNetworkViewCap,
-                                          ICapabilityProvider<BlockEntity, BC, BH> driveNetworkViewCapProvider) {
+                                          DeferredItem<Disk> disk, ItemCapability<DH, @Nullable Void> diskCap,
+                                          ICapabilityProvider<ItemStack, @Nullable Void, DH> diskCapProvider,
+                                          BlockCapability<BH, @Nullable BC> driveNetworkViewCap,
+                                          ICapabilityProvider<BlockEntity, @Nullable BC, BH> driveNetworkViewCapProvider) {
     public void registerDiskCapability(RegisterCapabilitiesEvent event) {
         event.registerItem(diskCap, diskCapProvider, disk);
     }
@@ -44,10 +45,10 @@ public record ResourceType<T, DH, BH, BC>(String key,
         private final DeferredRegister.Items items;
         private DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> id;
         private DeferredItem<Disk> disk;
-        private ItemCapability<DH, Void> diskCap;
-        private ICapabilityProvider<ItemStack, Void, DH> diskCapProvider;
-        private BlockCapability<BH, BC> driveNetworkViewCap;
-        private ICapabilityProvider<BlockEntity, BC, BH> driveNetworkViewCapProvider;
+        private ItemCapability<DH, @Nullable Void> diskCap;
+        private ICapabilityProvider<ItemStack, @Nullable Void, DH> diskCapProvider;
+        private BlockCapability<BH, @Nullable BC> driveNetworkViewCap;
+        private ICapabilityProvider<BlockEntity, @Nullable BC, BH> driveNetworkViewCapProvider;
 
         public Builder(String key, DeferredRegister.DataComponents dataComponents, DeferredRegister.Items items) {
             this.key = key;
@@ -69,7 +70,7 @@ public record ResourceType<T, DH, BH, BC>(String key,
             return this;
         }
 
-        public Builder<T, DH, BH, BC> diskHandler(ItemCapability<DH, Void> cap, ICapabilityProvider<ItemStack, Void, DH> provider) {
+        public Builder<T, DH, BH, BC> diskHandler(ItemCapability<DH, @Nullable Void> cap, ICapabilityProvider<ItemStack, @Nullable Void, DH> provider) {
             diskCap = cap;
             diskCapProvider = provider;
             return this;

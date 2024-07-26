@@ -27,31 +27,27 @@ import net.neoforged.neoforge.items.IItemHandler
 import net.neoforged.neoforge.registries.DeferredHolder
 
 object Resources {
-    private val REGISTER: DeferredResources =
-        DeferredResources(BulkIt.ID)
+    private val REGISTER: DeferredResources = DeferredResources(BulkIt.ID)
 
-    val ITEM: DeferredHolder<ResourceType<*, *, *, *>, ResourceType<Item, IItemHandler, IItemHandler, Direction>> =
+    val ITEM: DeferredHolder<ResourceType<*, *, *, *>, ResourceType<Item, IItemHandler, IItemHandler, Direction?>> =
         REGISTER.registerResourceType(
-            ResourceType.Builder<Item, IItemHandler, IItemHandler, Direction>(
+            ResourceType.Builder<Item, IItemHandler, IItemHandler, Direction?>(
                 "item", DataComponents.REGISTER, Items.REGISTER
             ).registry(BuiltInRegistries.ITEM).defaultDisk()
-                .diskHandler(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.ITEM) { stack, _ ->
-                    DiskItemHandler(
-                        stack
-                    )
-                }.driveNetworkViewHandler(
+                .diskHandler(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.ITEM, DiskItemHandler::build)
+                .driveNetworkViewHandler(
                     net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
                     DriveNetworkViewItemHandler::build
                 )
         )
 
-    val FLUID: DeferredHolder<ResourceType<*, *, *, *>, ResourceType<Fluid, IFluidHandlerItem, IFluidHandler, Direction>> =
+    val FLUID: DeferredHolder<ResourceType<*, *, *, *>, ResourceType<Fluid, IFluidHandlerItem, IFluidHandler, Direction?>> =
         REGISTER.registerResourceType(
-            ResourceType.Builder<Fluid, IFluidHandlerItem, IFluidHandler, Direction>(
+            ResourceType.Builder<Fluid, IFluidHandlerItem, IFluidHandler, Direction?>(
                 "fluid", DataComponents.REGISTER, Items.REGISTER
             ).registry(BuiltInRegistries.FLUID).defaultDisk().diskHandler(
-                net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM
-            ) { stack, _ -> DiskFluidHandler(stack) }.driveNetworkViewHandler(
+                net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM, DiskFluidHandler::build
+            ).driveNetworkViewHandler(
                 net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, DriveNetworkViewFluidHandler::build
             )
         )
@@ -63,9 +59,9 @@ object Resources {
     fun registerCapabilities(event: RegisterCapabilitiesEvent) {
         DeferredResources.REGISTRY.forEach {
             it.registerDiskCapability(event)
-            event.registerItem(Capabilities.Disk.RESOURCE, { stack, _ -> DiskResourceHandler(stack) }, it.disk)
+            event.registerItem(Capabilities.Disk.RESOURCE, { stack, _: Void? -> DiskResourceHandler(stack) }, it.disk)
             event.registerItem(
-                Capabilities.Disk.MODS, { stack, _ -> DiskModHandler(stack) }, it.disk
+                Capabilities.Disk.MODS, { stack, _: Void? -> DiskModHandler(stack) }, it.disk
             )
             it.registerDriveNetworkViewCapability(event, BlockEntities.DRIVE_NETWORK_VIEW.get())
         }

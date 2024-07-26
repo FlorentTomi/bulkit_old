@@ -109,10 +109,12 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
         fun capacity(resource: IDiskResourceHandler): Int =
             FluidType.BUCKET_VOLUME * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
 
-        fun buildOnlyNonRadioactive(disk: ItemStack): IGasHandler =
+        @Suppress("UNUSED_PARAMETER")
+        fun buildOnlyNonRadioactive(disk: ItemStack, ctx: Void?): IGasHandler =
             DiskGasHandler(disk, BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE)
 
-        fun buildOnlyRadioactive(disk: ItemStack): IGasHandler =
+        @Suppress("UNUSED_PARAMETER")
+        fun buildOnlyRadioactive(disk: ItemStack, ctx: Void?): IGasHandler =
             DiskGasHandler(disk, BulkItMekanism.GasFilter.ONLY_RADIOACTIVE)
     }
 }

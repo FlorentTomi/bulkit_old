@@ -101,6 +101,9 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER: Int = 32
 
+        @Suppress("UNUSED_PARAMETER")
+        fun build(stack: ItemStack, ctx: Void?) = DiskFluidHandler(stack)
+
         fun capacity(resource: IDiskResourceHandler): Int =
             FluidType.BUCKET_VOLUME * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
     }

@@ -19,18 +19,22 @@ object Resources {
     private val REGISTER: DeferredResources = DeferredResources(BulkItMekanism.ID)
 
     val GAS_NON_RADIOACTIVE: DeferredHolder<ResourceType<*, *, *, *>, ResourceType<Gas, IGasHandler, IGasHandler, Direction>> =
-        REGISTER.registerResourceType(ResourceType.Builder<Gas, IGasHandler, IGasHandler, Direction>(
-            "gas_non_radioactive", BulkItMekanism.DATA_COMPONENTS, BulkItMekanism.ITEMS
-        ).registry(MekanismAPI.GAS_REGISTRY).defaultDisk()
-            .diskHandler(Capabilities.GAS.item) { stack, _ -> DiskGasHandler.buildOnlyNonRadioactive(stack) }
-            .driveNetworkViewHandler(Capabilities.GAS.block, DriveNetworkViewGasHandler::buildOnlyNonRadioactive))
+        REGISTER.registerResourceType(
+            ResourceType.Builder<Gas, IGasHandler, IGasHandler, Direction>(
+                "gas_non_radioactive", BulkItMekanism.DATA_COMPONENTS, BulkItMekanism.ITEMS
+            ).registry(MekanismAPI.GAS_REGISTRY).defaultDisk()
+                .diskHandler(Capabilities.GAS.item, DiskGasHandler::buildOnlyNonRadioactive)
+                .driveNetworkViewHandler(Capabilities.GAS.block, DriveNetworkViewGasHandler::buildOnlyNonRadioactive)
+        )
 
     val GAS_RADIOACTIVE: DeferredHolder<ResourceType<*, *, *, *>, ResourceType<Gas, IGasHandler, IGasHandler, Direction>> =
-        REGISTER.registerResourceType(ResourceType.Builder<Gas, IGasHandler, IGasHandler, Direction>(
-            "gas_radioactive", BulkItMekanism.DATA_COMPONENTS, BulkItMekanism.ITEMS
-        ).registry(MekanismAPI.GAS_REGISTRY).defaultDisk()
-            .diskHandler(Capabilities.GAS.item) { stack, _ -> DiskGasHandler.buildOnlyRadioactive(stack) }
-            .driveNetworkViewHandler(Capabilities.GAS.block, DriveNetworkViewGasHandler::buildOnlyRadioactive))
+        REGISTER.registerResourceType(
+            ResourceType.Builder<Gas, IGasHandler, IGasHandler, Direction>(
+                "gas_radioactive", BulkItMekanism.DATA_COMPONENTS, BulkItMekanism.ITEMS
+            ).registry(MekanismAPI.GAS_REGISTRY).defaultDisk()
+                .diskHandler(Capabilities.GAS.item, DiskGasHandler::buildOnlyRadioactive)
+                .driveNetworkViewHandler(Capabilities.GAS.block, DriveNetworkViewGasHandler::buildOnlyRadioactive)
+        )
 
     fun register(event: IEventBus) {
         REGISTER.register(event)

@@ -94,6 +94,9 @@ class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER: Int = 8
 
+        @Suppress("UNUSED_PARAMETER")
+        fun build(stack: ItemStack, ctx: Void?) = DiskItemHandler(stack)
+
         fun capacity(maxStackSize: Int, resource: IDiskResourceHandler): Int =
             maxStackSize * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
 
