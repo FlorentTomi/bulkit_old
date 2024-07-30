@@ -10,6 +10,7 @@ import net.asch.bulkit.api.capability.IDiskResourceHandler
 import net.asch.bulkit.api.registry.ResourceType
 import net.asch.bulkit.mekanism.common.Resources
 import net.asch.bulkit.mekanism.common.capability.disk.DiskGasHandler
+import net.neoforged.neoforge.capabilities.ItemCapability
 import net.neoforged.neoforge.fluids.FluidType
 import net.neoforged.testframework.junit.EphemeralTestServerProvider
 import org.junit.jupiter.api.Assertions
@@ -28,8 +29,10 @@ object ResourceCapabilities {
         gas(Resources.GAS_RADIOACTIVE.get(), MekanismGases.PLUTONIUM.get(), MekanismGases.OXYGEN.get())
     }
 
-    private fun gas(resourceType: ResourceType<Gas, IGasHandler, *, *>, compatibleGasType: Gas, incompatibleGasType: Gas) {
-        assertInsert(resourceType, false) { handler, resourceHandler ->
+    private fun gas(resourceType: ResourceType<Gas>, compatibleGasType: Gas, incompatibleGasType: Gas) {
+        val diskCap = mekanism.common.capabilities.Capabilities.GAS.item
+
+        assertInsert(resourceType, diskCap, false) { handler, resourceHandler ->
             Assertions.assertEquals(handler.tanks, 1)
             Assertions.assertEquals(handler.getChemicalInTank(0).isEmpty, true)
 
@@ -47,7 +50,7 @@ object ResourceCapabilities {
             Assertions.assertEquals(capacity, handler.getChemicalInTank(0).amount)
         }
 
-        assertInsert(resourceType, true) { handler, resourceHandler ->
+        assertInsert(resourceType, diskCap, true) { handler, resourceHandler ->
             Assertions.assertEquals(handler.tanks, 1)
             Assertions.assertEquals(handler.getChemicalInTank(0).isEmpty, true)
 
@@ -72,12 +75,15 @@ object ResourceCapabilities {
             Assertions.assertTrue(handler.getChemicalInTank(0).isEmpty)
         }
 
-        assertExtract(resourceType, compatibleGasType, true, extractionTest)
-        assertExtract(resourceType, compatibleGasType, false, extractionTest)
+        assertExtract(resourceType, diskCap, compatibleGasType, true, extractionTest)
+        assertExtract(resourceType, diskCap, compatibleGasType, false, extractionTest)
     }
 
     private fun <H> assertInsert(
-        resourceType: ResourceType<*, H, *, *>, isVoidExcess: Boolean, tests: (H, IDiskResourceHandler) -> Unit
+        resourceType: ResourceType<*>,
+        cap: ItemCapability<H, Void?>,
+        isVoidExcess: Boolean,
+        tests: (H, IDiskResourceHandler) -> Unit
     ) {
         val disk = resourceType.disk.toStack()
         Assertions.assertFalse(disk.has(resourceType.id.get()))
@@ -85,13 +91,17 @@ object ResourceCapabilities {
         val diskResourceCap = disk.getCapability(Capabilities.Disk.RESOURCE)
         diskResourceCap?.isVoidExcess = isVoidExcess
 
-        val diskCap = disk.getCapability(resourceType.diskCap)
+        val diskCap = disk.getCapability(cap)
         Assertions.assertNotNull(diskCap)
         tests(diskCap!!, diskResourceCap!!)
     }
 
     private fun <T, H> assertExtract(
-        resourceType: ResourceType<T, H, *, *>, resourceToExtract: T, isLocked: Boolean, tests: (T, H) -> Unit
+        resourceType: ResourceType<T>,
+        cap: ItemCapability<H, Void?>,
+        resourceToExtract: T,
+        isLocked: Boolean,
+        tests: (T, H) -> Unit
     ) {
         val disk = resourceType.disk.toStack()
         Assertions.assertFalse(disk.has(resourceType.id.get()))
@@ -99,7 +109,7 @@ object ResourceCapabilities {
         val diskResourceCap = disk.getCapability(Capabilities.Disk.RESOURCE)
         diskResourceCap?.isLocked = isLocked
 
-        val diskCap = disk.getCapability(resourceType.diskCap)
+        val diskCap = disk.getCapability(cap)
         Assertions.assertNotNull(diskCap)
         tests(resourceToExtract, diskCap!!)
 

@@ -9,28 +9,27 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
 
-class DriveNetworkViewFluidHandler(blockEntity: BlockEntity, direction: Direction) : IFluidHandler {
+class DriveNetworkViewFluidHandler(blockEntity: BlockEntity, ctx: Direction) : IFluidHandler {
     private val resourceType = Resources.FLUID.get()
     private val nSlots = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val link: IDriveNetworkLink? = blockEntity.level?.getCapability(
-        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, direction
+        Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, ctx
     )
 
     override fun getTanks(): Int = nSlots
 
     override fun getFluidInTank(tank: Int): FluidStack =
-        link?.disk(tank)?.getCapability(resourceType.diskCap)?.getFluidInTank(0) ?: FluidStack.EMPTY
+        link?.disk(tank)?.getCapability(CAP)?.getFluidInTank(0) ?: FluidStack.EMPTY
 
-    override fun getTankCapacity(tank: Int): Int =
-        link?.disk(tank)?.getCapability(resourceType.diskCap)?.getTankCapacity(0) ?: 0
+    override fun getTankCapacity(tank: Int): Int = link?.disk(tank)?.getCapability(CAP)?.getTankCapacity(0) ?: 0
 
     override fun isFluidValid(tank: Int, stack: FluidStack): Boolean =
-        link?.disk(tank)?.getCapability(resourceType.diskCap)?.isFluidValid(0, stack) ?: false
+        link?.disk(tank)?.getCapability(CAP)?.isFluidValid(0, stack) ?: false
 
     override fun fill(stack: FluidStack, action: IFluidHandler.FluidAction): Int {
         val remainingStack = stack.copy()
         for (tank in 0 until nSlots) {
-            val filledAmount = link?.disk(tank)?.getCapability(resourceType.diskCap)?.fill(remainingStack, action) ?: 0
+            val filledAmount = link?.disk(tank)?.getCapability(CAP)?.fill(remainingStack, action) ?: 0
             remainingStack.shrink(filledAmount)
         }
 
@@ -45,8 +44,7 @@ class DriveNetworkViewFluidHandler(blockEntity: BlockEntity, direction: Directio
                 break
             }
 
-            val drained = link?.disk(tank)?.getCapability(resourceType.diskCap)?.drain(resourceToDrain, action)
-                ?: FluidStack.EMPTY
+            val drained = link?.disk(tank)?.getCapability(CAP)?.drain(resourceToDrain, action) ?: FluidStack.EMPTY
             if (drainedStack.isEmpty) {
                 drainedStack = drained.copy()
             } else {
@@ -67,12 +65,10 @@ class DriveNetworkViewFluidHandler(blockEntity: BlockEntity, direction: Directio
             }
 
             if (drainedStack.isEmpty) {
-                drainedStack =
-                    link?.disk(tank)?.getCapability(resourceType.diskCap)?.drain(amount, action) ?: FluidStack.EMPTY
+                drainedStack = link?.disk(tank)?.getCapability(CAP)?.drain(amount, action) ?: FluidStack.EMPTY
             } else {
                 val toDrain = drainedStack.copyWithAmount(amount - drainedStack.amount)
-                val drained =
-                    link?.disk(tank)?.getCapability(resourceType.diskCap)?.drain(toDrain, action) ?: FluidStack.EMPTY
+                val drained = link?.disk(tank)?.getCapability(CAP)?.drain(toDrain, action) ?: FluidStack.EMPTY
                 if (!drained.isEmpty) {
                     drainedStack.grow(drained.amount)
                 }
@@ -83,6 +79,8 @@ class DriveNetworkViewFluidHandler(blockEntity: BlockEntity, direction: Directio
     }
 
     companion object {
-        fun build(blockEntity: BlockEntity, direction: Direction) = DriveNetworkViewFluidHandler(blockEntity, direction)
+        private val CAP = net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM
+
+        fun build(blockEntity: BlockEntity, ctx: Direction) = DriveNetworkViewFluidHandler(blockEntity, ctx)
     }
 }

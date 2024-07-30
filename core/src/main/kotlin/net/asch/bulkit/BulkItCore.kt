@@ -9,7 +9,7 @@ import net.asch.bulkit.common.block_entity.BlockEntities
 import net.asch.bulkit.common.capability.Capabilities
 import net.asch.bulkit.common.data.DataComponents
 import net.asch.bulkit.common.item.Items
-import net.asch.bulkit.common.network.Payloads
+import net.asch.bulkit.network.Payloads
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
@@ -32,8 +32,7 @@ object BulkItCore {
 
     private val CREATIVE_TAB_REGISTER = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB, ID)
     private val CREATIVE_TAB = CREATIVE_TAB_REGISTER.register(ID) { ->
-        CreativeModeTab.builder().title(Component.literal("BulkIt")).displayItems(::registerToCreativeTab)
-            .build()
+        CreativeModeTab.builder().title(Component.literal("BulkIt")).displayItems(::registerToCreativeTab).build()
     }
 
     init {
@@ -58,6 +57,7 @@ object BulkItCore {
 
     private fun registerToCreativeTab(params: ItemDisplayParameters, output: Output) {
         Items.registerToCreativeTab(params, output)
+        Blocks.registerToCreativeTab(params, output)
         Resources.registerToCreativeTab(params, output)
     }
 
@@ -75,7 +75,7 @@ object BulkItCore {
         val registeredResources = DeferredResources.registeredResources()
 
         val msg = "registered resources [${
-            registeredResources.asSequence().map(ResourceType<*, *, *, *>::key).joinToString(",")
+            registeredResources.asSequence().map(ResourceType<*>::key).joinToString(",")
         }]";
         BulkIt.logInfo(msg);
     }

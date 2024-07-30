@@ -4,7 +4,6 @@ import net.asch.bulkit.api.data.ResourceIdentifier;
 import net.asch.bulkit.api.item.Disk;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,34 +20,37 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public record ResourceType<T, DH, BH, BC>(String key,
-                                          DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> id,
-                                          DeferredItem<Disk> disk, ItemCapability<DH, @Nullable Void> diskCap,
-                                          ICapabilityProvider<ItemStack, @Nullable Void, DH> diskCapProvider,
-                                          BlockCapability<BH, @Nullable BC> driveNetworkViewCap,
-                                          ICapabilityProvider<BlockEntity, @Nullable BC, BH> driveNetworkViewCapProvider) {
+public class ResourceType<T> {
+    public final String key;
+    public final DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> id;
+    public final DeferredItem<Disk> disk;
+    private final IDiskCapabilityRegister diskCapRegister;
+    private final IDriveNetworkViewCapabilityRegister driveNetworkViewCapRegister;
+
+    private ResourceType(String key, DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> id, DeferredItem<Disk> disk, IDiskCapabilityRegister diskCapRegister, IDriveNetworkViewCapabilityRegister driveNetworkViewCapRegister) {
+        this.key = key;
+        this.id = id;
+        this.disk = disk;
+        this.diskCapRegister = diskCapRegister;
+        this.driveNetworkViewCapRegister = driveNetworkViewCapRegister;
+    }
+
     public void registerDiskCapability(RegisterCapabilitiesEvent event) {
-        event.registerItem(diskCap, diskCapProvider, disk);
+        diskCapRegister.register(event);
     }
 
     public <BE extends BlockEntity> void registerDriveNetworkViewCapability(RegisterCapabilitiesEvent event, BlockEntityType<BE> blockEntityType) {
-        event.registerBlockEntity(driveNetworkViewCap, blockEntityType, driveNetworkViewCapProvider);
+        driveNetworkViewCapRegister.register(event, blockEntityType);
     }
 
-    public void registerToCreativeTab(CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
-        output.accept(disk);
-    }
-
-    public static class Builder<T, DH, BH, BC> implements Supplier<ResourceType<T, DH, BH, BC>> {
+    public static class Builder<T> implements Supplier<ResourceType<T>> {
         final String key;
         private final DeferredRegister.DataComponents dataComponents;
         private final DeferredRegister.Items items;
         private DeferredHolder<DataComponentType<?>, DataComponentType<ResourceIdentifier<T>>> id;
         private DeferredItem<Disk> disk;
-        private ItemCapability<DH, @Nullable Void> diskCap;
-        private ICapabilityProvider<ItemStack, @Nullable Void, DH> diskCapProvider;
-        private BlockCapability<BH, @Nullable BC> driveNetworkViewCap;
-        private ICapabilityProvider<BlockEntity, @Nullable BC, BH> driveNetworkViewCapProvider;
+        private IDiskCapabilityRegister diskCapRegister;
+        private IDriveNetworkViewCapabilityRegister driveNetworkViewCapRegister;
 
         public Builder(String key, DeferredRegister.DataComponents dataComponents, DeferredRegister.Items items) {
             this.key = key;
@@ -56,35 +58,43 @@ public record ResourceType<T, DH, BH, BC>(String key,
             this.items = items;
         }
 
-        public Builder<T, DH, BH, BC> registry(Registry<T> registry) {
+        public Builder<T> registry(Registry<T> registry) {
             id = dataComponents.registerComponentType("resource_" + key, (builder) -> builder.persistent(ResourceIdentifier.codec(registry)).networkSynchronized(ResourceIdentifier.streamCodec(registry)).cacheEncoding());
             return this;
         }
 
-        public Builder<T, DH, BH, BC> defaultDisk() {
-            return disk((props) -> new Disk(props.stacksTo(16)));
+        public Builder<T> defaultDisk() {
+            return disk(Disk::new);
         }
 
-        public Builder<T, DH, BH, BC> disk(Function<Item.Properties, Disk> sup) {
+        public Builder<T> disk(Function<Item.Properties, Disk> sup) {
             disk = items.registerItem("disk_" + key, sup);
             return this;
         }
 
-        public Builder<T, DH, BH, BC> diskHandler(ItemCapability<DH, @Nullable Void> cap, ICapabilityProvider<ItemStack, @Nullable Void, DH> provider) {
-            diskCap = cap;
-            diskCapProvider = provider;
+        public <H> Builder<T> diskHandler(ItemCapability<H, @Nullable Void> cap, ICapabilityProvider<ItemStack, @Nullable Void, H> provider) {
+            diskCapRegister = (RegisterCapabilitiesEvent event) -> event.registerItem(cap, provider, disk);
             return this;
         }
 
-        public Builder<T, DH, BH, BC> driveNetworkViewHandler(BlockCapability<BH, BC> cap, ICapabilityProvider<BlockEntity, BC, BH> provider) {
-            driveNetworkViewCap = cap;
-            driveNetworkViewCapProvider = provider;
+        public <H, C> Builder<T> driveNetworkViewHandler(BlockCapability<H, C> cap, ICapabilityProvider<BlockEntity, C, H> provider) {
+            driveNetworkViewCapRegister = (RegisterCapabilitiesEvent event, BlockEntityType<? extends BlockEntity> blockEntityType) -> event.registerBlockEntity(cap, blockEntityType, provider);
             return this;
         }
 
         @Override
-        public ResourceType<T, DH, BH, BC> get() {
-            return new ResourceType<>(key, id, disk, diskCap, diskCapProvider, driveNetworkViewCap, driveNetworkViewCapProvider);
+        public ResourceType<T> get() {
+            return new ResourceType<>(key, id, disk, diskCapRegister, driveNetworkViewCapRegister);
         }
+    }
+
+    @FunctionalInterface
+    public interface IDiskCapabilityRegister {
+        void register(RegisterCapabilitiesEvent event);
+    }
+
+    @FunctionalInterface
+    public interface IDriveNetworkViewCapabilityRegister {
+        void register(RegisterCapabilitiesEvent event, BlockEntityType<? extends BlockEntity> blockEntityType);
     }
 }

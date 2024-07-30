@@ -1,6 +1,7 @@
 package net.asch.bulkit.api.capability;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -14,11 +15,11 @@ public interface IDriveNetworkLink {
 
     void map(int slot, int rootSlot);
 
-    default void unlink() {
-        linkTo(null);
+    default void unlink(Player player) {
+        linkTo(player, null);
     }
 
-    void linkTo(@Nullable BlockPos blockPos);
+    void linkTo(Player player, @Nullable BlockPos blockPos);
 
     ItemStack disk(int slot);
 }

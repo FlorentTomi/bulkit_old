@@ -4,7 +4,6 @@ import net.asch.bulkit.api.BulkIt
 import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.common.block_entity.BlockEntities
 import net.asch.bulkit.common.capability.drive_network.DriveNetworkLink
-import net.asch.bulkit.common.data.Attachments
 import net.minecraft.core.Direction
 import net.neoforged.neoforge.capabilities.BlockCapability
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
@@ -16,14 +15,7 @@ object Capabilities {
 
     fun register(event: RegisterCapabilitiesEvent) {
         event.registerBlockEntity(
-            DISK_STORAGE, BlockEntities.DISK_DRIVE.get()
-        ) { stack, _ ->
-            stack.getData(Attachments.DRIVE_NETWORK_DISK_STORAGE)
-
-        }
-        event.registerBlockEntity(
             Capabilities.DriveNetwork.LINK, BlockEntities.DRIVE_NETWORK_VIEW.get(), DriveNetworkLink::build
         )
     }
-
 }

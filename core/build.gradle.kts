@@ -69,6 +69,7 @@ setupResourceProcessing(project)
 dependencies {
     implementation(libs.kotlinForForge)
     implementation(project(":api"))
+    compileOnly(kotlin("reflect"))
 
     testImplementation(libs.bundles.test.impl)
     testRuntimeOnly(libs.bundles.test.runtime)

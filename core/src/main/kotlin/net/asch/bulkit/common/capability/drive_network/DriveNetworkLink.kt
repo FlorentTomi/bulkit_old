@@ -2,16 +2,18 @@ package net.asch.bulkit.common.capability.drive_network
 
 import net.asch.bulkit.api.block.DriveNetworkViewBase
 import net.asch.bulkit.api.capability.IDriveNetworkLink
+import net.asch.bulkit.client.text.LangEntries
 import net.asch.bulkit.common.data.Attachments
 import net.asch.bulkit.common.data.delegate.AttachmentDelegate
 import net.asch.bulkit.common.data.delegate.DefaultedAttachmentDelegate
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 
-class DriveNetworkLink(blockEntity: BlockEntity, private val direction: Direction) : IDriveNetworkLink {
+class DriveNetworkLink(blockEntity: BlockEntity, @Suppress("UNUSED_PARAMETER") ctx: Direction) : IDriveNetworkLink {
     private val level: Level? = blockEntity.level
     private val nSlots: Int = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val emptySlots: List<Int> = emptySlotMapping(nSlots)
@@ -26,11 +28,13 @@ class DriveNetworkLink(blockEntity: BlockEntity, private val direction: Directio
         slotMapping = mapping
     }
 
-    override fun linkTo(blockPos: BlockPos?) {
+    override fun linkTo(player: Player, blockPos: BlockPos?) {
         blockPos?.let {
             if (level?.getBlockEntity(it)?.hasData(Attachments.DRIVE_NETWORK_DISK_STORAGE) == true) {
                 rootPosition = it
                 slotMapping = emptySlots.toMutableList()
+
+                player.displayClientMessage(LangEntries.CONFIGURATOR_LINK.component(it, rootPosition), true)
             }
         }
     }
@@ -51,7 +55,7 @@ class DriveNetworkLink(blockEntity: BlockEntity, private val direction: Directio
         private fun emptySlotMapping(size: Int): MutableList<Int> =
             MutableList(size) { IDriveNetworkLink.UNMAPPED_SLOT }
 
-        fun build(blockEntity: BlockEntity, direction: Direction): IDriveNetworkLink =
-            DriveNetworkLink(blockEntity, direction)
+        fun build(blockEntity: BlockEntity, ctx: Direction): IDriveNetworkLink =
+            DriveNetworkLink(blockEntity, ctx)
     }
 }

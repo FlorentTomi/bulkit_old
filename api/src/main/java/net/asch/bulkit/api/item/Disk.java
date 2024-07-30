@@ -4,6 +4,6 @@ import net.minecraft.world.item.Item;
 
 public class Disk extends Item {
     public Disk(Properties properties) {
-        super(properties);
+        super(properties.stacksTo(16));
     }
 }

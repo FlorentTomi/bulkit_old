@@ -4,9 +4,9 @@ bulkit-api = "0.1.0-alpha"
 bulkit-mekanism = "0.1.0-alpha"
 
 minecraft = "1.21"
-kotlin-jvm = "2.0.0"
+kotlin = "2.0.0"
 neoforged-moddev = "1.0.15"
-neoforged-neoforge = "21.0.139-beta"
+neoforged-neoforge = "21.0.143"
 parchment-mappings = "2024.06.23"
 parchment-minecraft = "1.21"
 kotlinForForge = "5.4.0"
@@ -26,7 +26,7 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 junitPlatform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-jvm" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 neoforged-moddev = { id = "net.neoforged.moddev", version.ref = "neoforged-moddev" }
 
 [bundles]

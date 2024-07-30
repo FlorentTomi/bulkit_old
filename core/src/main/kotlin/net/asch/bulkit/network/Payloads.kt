@@ -1,4 +1,4 @@
-package net.asch.bulkit.common.network
+package net.asch.bulkit.network
 
 import net.asch.bulkit.api.BulkIt
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent

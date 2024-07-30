@@ -8,7 +8,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import net.asch.bulkit.api.BulkIt
-import net.asch.bulkit.common.network.DiskPayloads
+import net.asch.bulkit.network.DiskPayloads
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.item.ItemArgument

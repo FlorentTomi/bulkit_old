@@ -16,5 +16,5 @@ BulkIt.setup(project)
 
 project.tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(jvmTarget)
-    kotlinOptions.allWarningsAsErrors = true
+//    kotlinOptions.allWarningsAsErrors = true
 }

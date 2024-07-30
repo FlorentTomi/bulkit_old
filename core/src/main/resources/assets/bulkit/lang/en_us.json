@@ -1,0 +1,5 @@
+{
+  "bulkit.configurator.clear_root": "[BulkIt]: connection cleared",
+  "bulkit.configurator.set_root": "[BulkIt]: root drive set to [%s]",
+  "bulkit.configurator.link": "[BulkIt]: linked [%s] to [%s]"
+}

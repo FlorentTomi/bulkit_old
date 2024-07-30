@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.material.Fluid
 import net.minecraft.world.level.material.Fluids
+import net.neoforged.neoforge.capabilities.ItemCapability
 import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.FluidType
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
@@ -24,7 +25,8 @@ object ResourceCapabilities {
     @Test
     fun item() {
         val resourceType = Resources.ITEM.get()
-        assertInsert(resourceType, false) { handler, resourceHandler ->
+        val cap = net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.ITEM
+        assertInsert(resourceType, cap, false) { handler, resourceHandler ->
             Assertions.assertEquals(handler.slots, 1)
             Assertions.assertEquals(handler.getStackInSlot(0).isEmpty, true)
 
@@ -36,7 +38,7 @@ object ResourceCapabilities {
             Assertions.assertEquals(capacity, handler.getStackInSlot(0).count)
         }
 
-        assertInsert(resourceType, true) { handler, resourceHandler ->
+        assertInsert(resourceType, cap, true) { handler, resourceHandler ->
             Assertions.assertEquals(handler.slots, 1)
             Assertions.assertEquals(handler.getStackInSlot(0).isEmpty, true)
 
@@ -61,14 +63,15 @@ object ResourceCapabilities {
             Assertions.assertTrue(handler.getStackInSlot(0).isEmpty)
         }
 
-        assertExtract(resourceType, Items.REDSTONE, true, extractionTest)
-        assertExtract(resourceType, Items.REDSTONE, false, extractionTest)
+        assertExtract(resourceType, cap, Items.REDSTONE, true, extractionTest)
+        assertExtract(resourceType, cap, Items.REDSTONE, false, extractionTest)
     }
 
     @Test
     fun fluid() {
         val resourceType = Resources.FLUID.get()
-        assertInsert(resourceType, false) { handler, resourceHandler ->
+        val cap = net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM
+        assertInsert(resourceType, cap, false) { handler, resourceHandler ->
             Assertions.assertEquals(handler.tanks, 1)
             Assertions.assertEquals(handler.getFluidInTank(0).isEmpty, true)
 
@@ -79,7 +82,7 @@ object ResourceCapabilities {
             Assertions.assertEquals(capacity, filled)
         }
 
-        assertInsert(resourceType, true) { handler, resourceHandler ->
+        assertInsert(resourceType, cap, true) { handler, resourceHandler ->
             Assertions.assertEquals(handler.tanks, 1)
             Assertions.assertEquals(handler.getFluidInTank(0).isEmpty, true)
 
@@ -103,12 +106,15 @@ object ResourceCapabilities {
             Assertions.assertTrue(handler.getFluidInTank(0).isEmpty)
         }
 
-        assertExtract(resourceType, Fluids.WATER, true, extractionTest)
-        assertExtract(resourceType, Fluids.WATER, false, extractionTest)
+        assertExtract(resourceType, cap, Fluids.WATER, true, extractionTest)
+        assertExtract(resourceType, cap, Fluids.WATER, false, extractionTest)
     }
 
     private fun <H> assertInsert(
-        resourceType: ResourceType<*, H, *, *>, isVoidExcess: Boolean, tests: (H, IDiskResourceHandler) -> Unit
+        resourceType: ResourceType<*>,
+        cap: ItemCapability<H, Void?>,
+        isVoidExcess: Boolean,
+        tests: (H, IDiskResourceHandler) -> Unit
     ) {
         val disk = resourceType.disk.toStack()
         Assertions.assertFalse(disk.has(resourceType.id.get()))
@@ -116,13 +122,17 @@ object ResourceCapabilities {
         val diskResourceCap = disk.getCapability(Capabilities.Disk.RESOURCE)
         diskResourceCap?.isVoidExcess = isVoidExcess
 
-        val diskCap = disk.getCapability(resourceType.diskCap)
+        val diskCap = disk.getCapability(cap)
         Assertions.assertNotNull(diskCap)
         tests(diskCap!!, diskResourceCap!!)
     }
 
     private fun <T, H> assertExtract(
-        resourceType: ResourceType<T, H, *, *>, resourceToExtract: T, isLocked: Boolean, tests: (T, H) -> Unit
+        resourceType: ResourceType<T>,
+        cap: ItemCapability<H, Void?>,
+        resourceToExtract: T,
+        isLocked: Boolean,
+        tests: (T, H) -> Unit
     ) {
         val disk = resourceType.disk.toStack()
         Assertions.assertFalse(disk.has(resourceType.id.get()))
@@ -130,7 +140,7 @@ object ResourceCapabilities {
         val diskResourceCap = disk.getCapability(Capabilities.Disk.RESOURCE)
         diskResourceCap?.isLocked = isLocked
 
-        val diskCap = disk.getCapability(resourceType.diskCap)
+        val diskCap = disk.getCapability(cap)
         Assertions.assertNotNull(diskCap)
         tests(resourceToExtract, diskCap!!)
 

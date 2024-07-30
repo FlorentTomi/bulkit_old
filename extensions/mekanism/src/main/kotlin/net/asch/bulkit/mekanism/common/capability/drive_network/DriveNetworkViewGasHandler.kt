@@ -20,25 +20,26 @@ class DriveNetworkViewGasHandler(blockEntity: BlockEntity, filter: BulkItMekanis
 
     override fun getTanks(): Int = nSlots
     override fun getChemicalInTank(tank: Int): GasStack =
-        link?.disk(tank)?.getCapability(resourceType.diskCap)?.getChemicalInTank(0) ?: GasStack.EMPTY
+        link?.disk(tank)?.getCapability(CAP)?.getChemicalInTank(0) ?: GasStack.EMPTY
 
-    override fun getTankCapacity(tank: Int): Long =
-        link?.disk(tank)?.getCapability(resourceType.diskCap)?.getTankCapacity(0) ?: 0
+    override fun getTankCapacity(tank: Int): Long = link?.disk(tank)?.getCapability(CAP)?.getTankCapacity(0) ?: 0
 
     override fun isValid(tank: Int, stack: GasStack): Boolean =
-        link?.disk(tank)?.getCapability(resourceType.diskCap)?.isValid(0, stack) ?: false
+        link?.disk(tank)?.getCapability(CAP)?.isValid(0, stack) ?: false
 
     override fun insertChemical(tank: Int, stack: GasStack, action: Action): GasStack =
-        link?.disk(tank)?.getCapability(resourceType.diskCap)?.insertChemical(0, stack, action) ?: stack
+        link?.disk(tank)?.getCapability(CAP)?.insertChemical(0, stack, action) ?: stack
 
     override fun extractChemical(tank: Int, amount: Long, action: Action): GasStack =
-        link?.disk(tank)?.getCapability(resourceType.diskCap)?.extractChemical(0, amount, action) ?: emptyStack
+        link?.disk(tank)?.getCapability(CAP)?.extractChemical(0, amount, action) ?: emptyStack
 
     override fun setChemicalInTank(tank: Int, stack: GasStack) {
-        link?.disk(tank)?.getCapability(resourceType.diskCap)?.setChemicalInTank(0, stack)
+        link?.disk(tank)?.getCapability(CAP)?.setChemicalInTank(0, stack)
     }
 
     companion object {
+        private val CAP = mekanism.common.capabilities.Capabilities.GAS.item
+
         fun buildOnlyNonRadioactive(blockEntity: BlockEntity, ctx: Direction): IGasHandler =
             DriveNetworkViewGasHandler(blockEntity, BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE, ctx)
 

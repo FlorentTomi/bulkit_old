@@ -1,9 +1,8 @@
-package net.asch.bulkit.common.network
+package net.asch.bulkit.network
 
 import net.asch.bulkit.BulkItCore
 import net.asch.bulkit.api.BulkIt
 import net.asch.bulkit.api.capability.Capabilities
-import net.asch.bulkit.common.Resources
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
@@ -38,12 +37,14 @@ object DiskPayloads {
         val mainHandItem = player.mainHandItem
         when (payload.type()) {
             AddItem.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(Resources.ITEM.get().diskCap)
+                val diskCapability =
+                    mainHandItem.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.ITEM)
                 diskCapability?.insertItem(0, (payload as AddItem).stack, false)
             }
 
             AddFluid.TYPE -> {
-                val diskCapability = mainHandItem.getCapability(Resources.FLUID.get().diskCap)
+                val diskCapability =
+                    mainHandItem.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM)
                 diskCapability?.fill((payload as AddFluid).stack, IFluidHandler.FluidAction.EXECUTE)
             }
 

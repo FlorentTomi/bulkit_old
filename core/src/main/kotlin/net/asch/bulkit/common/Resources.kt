@@ -13,7 +13,6 @@ import net.asch.bulkit.common.capability.drive_network.DriveNetworkViewFluidHand
 import net.asch.bulkit.common.capability.drive_network.DriveNetworkViewItemHandler
 import net.asch.bulkit.common.data.DataComponents
 import net.asch.bulkit.common.item.Items
-import net.minecraft.core.Direction
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters
 import net.minecraft.world.item.CreativeModeTab.Output
@@ -21,17 +20,14 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.material.Fluid
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
-import net.neoforged.neoforge.fluids.capability.IFluidHandler
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem
-import net.neoforged.neoforge.items.IItemHandler
 import net.neoforged.neoforge.registries.DeferredHolder
 
 object Resources {
     private val REGISTER: DeferredResources = DeferredResources(BulkIt.ID)
 
-    val ITEM: DeferredHolder<ResourceType<*, *, *, *>, ResourceType<Item, IItemHandler, IItemHandler, Direction?>> =
+    val ITEM: DeferredHolder<ResourceType<*>, ResourceType<Item>> =
         REGISTER.registerResourceType(
-            ResourceType.Builder<Item, IItemHandler, IItemHandler, Direction?>(
+            ResourceType.Builder<Item>(
                 "item", DataComponents.REGISTER, Items.REGISTER
             ).registry(BuiltInRegistries.ITEM).defaultDisk()
                 .diskHandler(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.ITEM, DiskItemHandler::build)
@@ -41,9 +37,9 @@ object Resources {
                 )
         )
 
-    val FLUID: DeferredHolder<ResourceType<*, *, *, *>, ResourceType<Fluid, IFluidHandlerItem, IFluidHandler, Direction?>> =
+    val FLUID: DeferredHolder<ResourceType<*>, ResourceType<Fluid>> =
         REGISTER.registerResourceType(
-            ResourceType.Builder<Fluid, IFluidHandlerItem, IFluidHandler, Direction?>(
+            ResourceType.Builder<Fluid>(
                 "fluid", DataComponents.REGISTER, Items.REGISTER
             ).registry(BuiltInRegistries.FLUID).defaultDisk().diskHandler(
                 net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM, DiskFluidHandler::build
