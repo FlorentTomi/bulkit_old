@@ -3,12 +3,16 @@ package net.asch.bulkit
 import net.asch.bulkit.api.BulkIt
 import net.asch.bulkit.api.registry.DeferredResources
 import net.asch.bulkit.api.registry.ResourceType
+import net.asch.bulkit.client.gui.screen.MenuScreens
 import net.asch.bulkit.common.Resources
 import net.asch.bulkit.common.block.Blocks
 import net.asch.bulkit.common.block_entity.BlockEntities
 import net.asch.bulkit.common.capability.Capabilities
+import net.asch.bulkit.common.command.Commands
+import net.asch.bulkit.common.command.DiskCommands
 import net.asch.bulkit.common.data.DataComponents
 import net.asch.bulkit.common.item.Items
+import net.asch.bulkit.common.menu.Menus
 import net.asch.bulkit.network.Payloads
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
@@ -19,7 +23,11 @@ import net.minecraft.world.item.CreativeModeTab.Output
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent
+import net.neoforged.fml.loading.FMLEnvironment
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent
+import net.neoforged.neoforge.common.NeoForge
+import net.neoforged.neoforge.event.RegisterCommandsEvent
 import net.neoforged.neoforge.network.PacketDistributor
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -31,8 +39,12 @@ object BulkItCore {
     const val ID = BulkIt.ID
 
     private val CREATIVE_TAB_REGISTER = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB, ID)
-    private val CREATIVE_TAB = CREATIVE_TAB_REGISTER.register(ID) { ->
+    private val CREATIVE_TAB_CORE = CREATIVE_TAB_REGISTER.register(ID) { ->
         CreativeModeTab.builder().title(Component.literal("BulkIt")).displayItems(::registerToCreativeTab).build()
+    }
+    private val CREATIVE_TAB_DISKS = CREATIVE_TAB_REGISTER.register("${ID}_disks") { ->
+        CreativeModeTab.builder().title(Component.literal("BulkIt - Disks")).displayItems(::registerDisksToCreativeTab)
+            .build()
     }
 
     init {
@@ -42,6 +54,12 @@ object BulkItCore {
         eventBus.addListener(FMLLoadCompleteEvent::class.java, ::onLoadComplete)
         eventBus.addListener(RegisterPayloadHandlersEvent::class.java, Payloads::register)
         register(eventBus)
+
+        NeoForge.EVENT_BUS.addListener(RegisterCommandsEvent::class.java, ::onRegisterCommands)
+
+        if (FMLEnvironment.dist.isClient) {
+            eventBus.addListener(RegisterMenuScreensEvent::class.java, MenuScreens::register)
+        }
     }
 
     fun <PayloadType : CustomPacketPayload> sendToServer(payload: PayloadType) = PacketDistributor.sendToServer(payload)
@@ -53,12 +71,18 @@ object BulkItCore {
         DataComponents.register(eventBus)
         Items.register(eventBus)
         Resources.register(eventBus)
+        Menus.register(eventBus)
+        Commands.register(eventBus)
     }
 
     private fun registerToCreativeTab(params: ItemDisplayParameters, output: Output) {
         Items.registerToCreativeTab(params, output)
         Blocks.registerToCreativeTab(params, output)
-        Resources.registerToCreativeTab(params, output)
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun registerDisksToCreativeTab(params: ItemDisplayParameters, output: Output) {
+        Resources.addToCreativeTab(output)
     }
 
     private fun onRegisterCapabilities(event: RegisterCapabilitiesEvent) {
@@ -78,5 +102,9 @@ object BulkItCore {
             registeredResources.asSequence().map(ResourceType<*>::key).joinToString(",")
         }]";
         BulkIt.logInfo(msg);
+    }
+
+    private fun onRegisterCommands(event: RegisterCommandsEvent) {
+        DiskCommands.register(event.dispatcher, event.buildContext)
     }
 }

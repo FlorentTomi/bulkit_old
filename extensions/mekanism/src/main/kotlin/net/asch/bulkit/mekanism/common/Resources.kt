@@ -35,10 +35,4 @@ object Resources {
     fun register(event: IEventBus) {
         REGISTER.register(event)
     }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun registerToCreativeTab(params: ItemDisplayParameters, output: Output) {
-        output.accept(GAS_NON_RADIOACTIVE.get().disk)
-        output.accept(GAS_RADIOACTIVE.get().disk)
-    }
 }

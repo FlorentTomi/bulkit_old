@@ -8,6 +8,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.common.command.fluid.FluidArgument
+import net.asch.bulkit.common.command.fluid.FluidInput
 import net.asch.bulkit.network.DiskPayloads
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
@@ -85,17 +87,17 @@ object DiskCommands {
                     )
                 )
             )
-//            .then(
-//            LiteralArgumentBuilder.literal<CommandSourceStack>("fluid").then(
-//                RequiredArgumentBuilder.argument<CommandSourceStack, FluidInput>(
-//                    "fluid", FluidArgument.fluid(buildContext)
-//                ).then(
-//                    RequiredArgumentBuilder.argument<CommandSourceStack, Int>(
-//                        "amount", IntegerArgumentType.integer(0)
-//                    ).executes(::addFluid)
-//                )
-//            )
-//        )
+            .then(
+            LiteralArgumentBuilder.literal<CommandSourceStack>("fluid").then(
+                RequiredArgumentBuilder.argument<CommandSourceStack, FluidInput>(
+                    "fluid", FluidArgument.fluid(buildContext)
+                ).then(
+                    RequiredArgumentBuilder.argument<CommandSourceStack, Int>(
+                        "amount", IntegerArgumentType.integer(0)
+                    ).executes(::addFluid)
+                )
+            )
+        )
         )
     }
 
@@ -107,13 +109,13 @@ object DiskCommands {
         return 0
     }
 
-//    private fun addFluid(context: CommandContext<CommandSourceStack>): Int {
-//        val fluid = FluidArgument.fluidOf(context, "fluid")
-//        val amount = IntegerArgumentType.getInteger(context, "amount")
-//        val stack = fluid.createFluidStack(amount)
-//        DiskPayloads.addFluid(stack)
-//        return 0
-//    }
+    private fun addFluid(context: CommandContext<CommandSourceStack>): Int {
+        val fluid = FluidArgument.fluidOf(context, "fluid")
+        val amount = IntegerArgumentType.getInteger(context, "amount")
+        val stack = fluid.createFluidStack(amount)
+        DiskPayloads.addFluid(stack)
+        return 0
+    }
 
     private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenGrow(builder: ArgumentBuilder<CommandSourceStack, T>) =
         builder.then(

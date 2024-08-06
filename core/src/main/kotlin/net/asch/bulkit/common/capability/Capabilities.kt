@@ -3,6 +3,7 @@ package net.asch.bulkit.common.capability
 import net.asch.bulkit.api.BulkIt
 import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.common.block_entity.BlockEntities
+import net.asch.bulkit.common.capability.drive_network.DiskDriveStorage
 import net.asch.bulkit.common.capability.drive_network.DriveNetworkLink
 import net.minecraft.core.Direction
 import net.neoforged.neoforge.capabilities.BlockCapability
@@ -14,6 +15,10 @@ object Capabilities {
         BlockCapability.createSided(BulkIt.location("disk_storage"), IItemHandler::class.java)
 
     fun register(event: RegisterCapabilitiesEvent) {
+        event.registerBlockEntity(
+            DISK_STORAGE, BlockEntities.DISK_DRIVE.get()
+        ) { _, _ -> DiskDriveStorage() }
+
         event.registerBlockEntity(
             Capabilities.DriveNetwork.LINK, BlockEntities.DRIVE_NETWORK_VIEW.get(), DriveNetworkLink::build
         )

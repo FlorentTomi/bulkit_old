@@ -31,6 +31,8 @@ object Items {
 
     @Suppress("UNUSED_PARAMETER")
     fun registerToCreativeTab(params: ItemDisplayParameters, output: Output) {
-        REGISTER.entries.forEach { output.accept(it.get()) }
+        output.accept(DRIVE_NETWORK_CONFIGURATOR)
+        output.accept(CAPACITY_DOWNGRADE_MOD)
+        CAPACITY_UPGRADE_MODS.forEach { output.accept(it.value) }
     }
 }

@@ -9,5 +9,7 @@ object Payloads {
     fun register(event: RegisterPayloadHandlersEvent) {
         val registrar = event.registrar(BulkIt.ID).versioned(VERSION)
         DiskPayloads.register(registrar)
+        DriveNetworkPayloads.register(registrar)
+        GuiPayloads.register(registrar)
     }
 }

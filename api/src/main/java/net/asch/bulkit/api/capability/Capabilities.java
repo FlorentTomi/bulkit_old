@@ -11,6 +11,8 @@ public class Capabilities {
     public static class Disk {
         public static ItemCapability<IDiskResourceHandler, @Nullable Void> RESOURCE = ItemCapability.createVoid(BulkIt.location("disk_resource"), IDiskResourceHandler.class);
         public static ItemCapability<IItemHandler, @Nullable Void> MODS = ItemCapability.createVoid(BulkIt.location("disk_mods"), IItemHandler.class);
+
+        public static ItemCapability<IDiskResourceRenderer, @Nullable Void> RESOURCE_RENDERER = ItemCapability.createVoid(BulkIt.location("disk_resource_renderer"), IDiskResourceRenderer.class);
     }
 
     public static class DriveNetwork {

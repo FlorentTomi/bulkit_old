@@ -9,7 +9,6 @@ import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters
 import net.minecraft.world.item.CreativeModeTab.Output
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import net.neoforged.neoforge.registries.DeferredRegister
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -43,7 +42,6 @@ object BulkItMekanism {
     }
 
     private fun registerToCreativeTab(params: ItemDisplayParameters, output: Output) {
-        Resources.registerToCreativeTab(params, output)
     }
 
     enum class GasFilter {

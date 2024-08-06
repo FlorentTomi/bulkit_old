@@ -1,5 +1,7 @@
 package net.asch.bulkit.api.registry;
 
+import net.asch.bulkit.api.capability.Capabilities;
+import net.asch.bulkit.api.capability.DiskResourceRenderer;
 import net.asch.bulkit.api.data.ResourceIdentifier;
 import net.asch.bulkit.api.item.Disk;
 import net.minecraft.core.Registry;
@@ -72,8 +74,13 @@ public class ResourceType<T> {
             return this;
         }
 
-        public <H> Builder<T> diskHandler(ItemCapability<H, @Nullable Void> cap, ICapabilityProvider<ItemStack, @Nullable Void, H> provider) {
-            diskCapRegister = (RegisterCapabilitiesEvent event) -> event.registerItem(cap, provider, disk);
+        public <H> Builder<T> diskHandler(ItemCapability<H, @Nullable Void> cap, ICapabilityProvider<ItemStack, @Nullable Void, H> resourceProvider, @Nullable ICapabilityProvider<ItemStack, @Nullable Void, DiskResourceRenderer<T>> rendererProvider) {
+            diskCapRegister = (RegisterCapabilitiesEvent event) -> {
+                event.registerItem(cap, resourceProvider, disk);
+                if (rendererProvider != null) {
+                    event.registerItem(Capabilities.Disk.RESOURCE_RENDERER, rendererProvider::getCapability, disk);
+                }
+            };
             return this;
         }
 
@@ -88,13 +95,14 @@ public class ResourceType<T> {
         }
     }
 
+
     @FunctionalInterface
-    public interface IDiskCapabilityRegister {
+    private interface IDiskCapabilityRegister {
         void register(RegisterCapabilitiesEvent event);
     }
 
     @FunctionalInterface
-    public interface IDriveNetworkViewCapabilityRegister {
+    private interface IDriveNetworkViewCapabilityRegister {
         void register(RegisterCapabilitiesEvent event, BlockEntityType<? extends BlockEntity> blockEntityType);
     }
 }

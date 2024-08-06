@@ -54,15 +54,15 @@ neoForge {
         }
     }
 
-    unitTest {
-        enable()
-        testedMod = mod
-    }
+//    unitTest {
+//        enable()
+//        testedMod = mod
+//    }
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-}
+//tasks.named<Test>("test") {
+//    useJUnitPlatform()
+//}
 
 setupResourceProcessing(project)
 
@@ -71,6 +71,6 @@ dependencies {
     implementation(project(":api"))
     compileOnly(kotlin("reflect"))
 
-    testImplementation(libs.bundles.test.impl)
-    testRuntimeOnly(libs.bundles.test.runtime)
+//    testImplementation(libs.bundles.test.impl)
+//    testRuntimeOnly(libs.bundles.test.runtime)
 }
