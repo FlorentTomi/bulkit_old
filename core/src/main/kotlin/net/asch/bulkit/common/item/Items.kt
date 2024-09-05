@@ -1,6 +1,6 @@
 package net.asch.bulkit.common.item
 
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.asch.bulkit.common.block.Blocks
 import net.asch.bulkit.common.item.mod.CapacityDowngradeMod
 import net.asch.bulkit.common.item.mod.CapacityUpgradeMod
@@ -11,7 +11,7 @@ import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 
 object Items {
-    val REGISTER: DeferredRegister.Items = DeferredRegister.createItems(BulkIt.ID)
+    val REGISTER: DeferredRegister.Items = DeferredRegister.createItems(BulkItApi.ID)
 
     val DRIVE_NETWORK_CONFIGURATOR: DeferredItem<DriveNetworkConfigurator> =
         REGISTER.registerItem("drive_network_configurator") { props -> DriveNetworkConfigurator(props) }

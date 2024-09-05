@@ -1,7 +1,7 @@
 package net.asch.bulkit.common.data
 
 import com.mojang.serialization.Codec
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.asch.bulkit.api.item.Disk
 import net.minecraft.core.BlockPos
 import net.minecraft.world.item.ItemStack
@@ -13,7 +13,7 @@ import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.NeoForgeRegistries
 
 object Attachments {
-    private val register = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, BulkIt.ID)
+    private val register = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, BulkItApi.ID)
 
     val DRIVE_NETWORK_DISK_STORAGE: DeferredHolder<AttachmentType<*>, AttachmentType<DiskHandler>> =
         register.register("drive_network_disk_storage") { ->

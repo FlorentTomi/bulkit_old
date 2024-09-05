@@ -1,8 +1,8 @@
 package net.asch.bulkit.network
 
 import io.netty.buffer.ByteBuf
-import net.asch.bulkit.BulkItCore
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.asch.bulkit.api.capability.Capabilities
 import net.minecraft.core.BlockPos
 import net.minecraft.network.codec.StreamCodec
@@ -15,7 +15,7 @@ object DriveNetworkPayloads {
         registrar.playToServer(Link.TYPE, Link.STREAM_CODEC, ::handlePayload)
     }
 
-    fun link(pos: BlockPos, rootPos: BlockPos?) = BulkItCore.sendToServer(Link(pos, rootPos))
+    fun link(pos: BlockPos, rootPos: BlockPos?) = BulkItApi.sendToServer(Link(pos, rootPos))
 
     private inline fun <reified PayloadType : CustomPacketPayload> handlePayload(
         payload: PayloadType, context: IPayloadContext

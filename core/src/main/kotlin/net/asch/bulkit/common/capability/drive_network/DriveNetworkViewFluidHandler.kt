@@ -10,7 +10,6 @@ import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
 
 class DriveNetworkViewFluidHandler(blockEntity: BlockEntity, ctx: Direction) : IFluidHandler {
-    private val resourceType = Resources.FLUID.get()
     private val nSlots = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val link: IDriveNetworkLink? = blockEntity.level?.getCapability(
         Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, ctx

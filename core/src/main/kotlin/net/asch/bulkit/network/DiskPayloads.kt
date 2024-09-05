@@ -1,7 +1,7 @@
 package net.asch.bulkit.network
 
-import net.asch.bulkit.BulkItCore
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.asch.bulkit.api.capability.Capabilities
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
@@ -17,18 +17,20 @@ object DiskPayloads {
     fun register(registrar: PayloadRegistrar) {
         registrar.playToServer(AddItem.TYPE, AddItem.STREAM_CODEC, ::handlePayload)
         registrar.playToServer(AddFluid.TYPE, AddFluid.STREAM_CODEC, ::handlePayload)
+        registrar.playToServer(AddEnergy.TYPE, AddEnergy.STREAM_CODEC, ::handlePayload)
         registrar.playToServer(Grow.TYPE, Grow.STREAM_CODEC, ::handlePayload)
         registrar.playToServer(Shrink.TYPE, Shrink.STREAM_CODEC, ::handlePayload)
         registrar.playToServer(Lock.TYPE, Lock.STREAM_CODEC, ::handlePayload)
         registrar.playToServer(Void.TYPE, Void.STREAM_CODEC, ::handlePayload)
     }
 
-    fun addItem(stack: ItemStack) = BulkItCore.sendToServer(AddItem(stack))
-    fun addFluid(stack: FluidStack) = BulkItCore.sendToServer(AddFluid(stack))
-    fun grow(amount: Long) = BulkItCore.sendToServer(Grow(amount))
-    fun shrink(amount: Long) = BulkItCore.sendToServer(Shrink(amount))
-    fun lock(locked: Boolean) = BulkItCore.sendToServer(Lock(locked))
-    fun void(void: Boolean) = BulkItCore.sendToServer(Void(void))
+    fun addItem(stack: ItemStack) = BulkItApi.sendToServer(AddItem(stack))
+    fun addFluid(stack: FluidStack) = BulkItApi.sendToServer(AddFluid(stack))
+    fun addEnergy(amount: Long) = BulkItApi.sendToServer(AddEnergy(amount))
+    fun grow(amount: Long) = BulkItApi.sendToServer(Grow(amount))
+    fun shrink(amount: Long) = BulkItApi.sendToServer(Shrink(amount))
+    fun lock(locked: Boolean) = BulkItApi.sendToServer(Lock(locked))
+    fun void(void: Boolean) = BulkItApi.sendToServer(Void(void))
 
     private inline fun <reified PayloadType : CustomPacketPayload> handlePayload(
         payload: PayloadType, context: IPayloadContext
@@ -46,6 +48,12 @@ object DiskPayloads {
                 val diskCapability =
                     mainHandItem.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM)
                 diskCapability?.fill((payload as AddFluid).stack, IFluidHandler.FluidAction.EXECUTE)
+            }
+
+            AddEnergy.TYPE -> {
+                val diskCapability =
+                    mainHandItem.getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.ITEM)
+                diskCapability?.receiveEnergy((payload as AddEnergy).amount.toInt(), false)
             }
 
             Grow.TYPE -> {
@@ -88,6 +96,17 @@ object DiskPayloads {
             val TYPE = CustomPacketPayload.Type<AddFluid>(BulkIt.location("disk_add_fluid"))
             val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, AddFluid> = StreamCodec.composite(
                 FluidStack.OPTIONAL_STREAM_CODEC, AddFluid::stack, ::AddFluid
+            )
+        }
+    }
+
+    private class AddEnergy(val amount: Long) : CustomPacketPayload {
+        override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> = TYPE
+
+        companion object {
+            val TYPE = CustomPacketPayload.Type<AddEnergy>(BulkIt.location("disk_add_energy"))
+            val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, AddEnergy> = StreamCodec.composite(
+                ByteBufCodecs.VAR_LONG, AddEnergy::amount, ::AddEnergy
             )
         }
     }

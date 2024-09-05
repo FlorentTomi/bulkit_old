@@ -7,13 +7,14 @@ import mekanism.api.chemical.gas.IGasHandler
 import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.api.capability.IDiskResourceHandler
 import net.asch.bulkit.api.data.ResourceIdentifier
-import net.asch.bulkit.mekanism.BulkItMekanism
-import net.minecraft.core.component.DataComponentPatch
+import net.asch.bulkit.api.registry.ResourceType
+import net.asch.bulkit.mekanism.BulkIt
+import net.asch.bulkit.mekanism.common.data.extensions.identifier
+import net.asch.bulkit.mekanism.common.data.extensions.of
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.fluids.FluidType
 
-class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMekanism.GasFilter) : IGasHandler {
-    private val resourceType = BulkItMekanism.gasResource(filter).get()
+class DiskGasHandler(private val disk: ItemStack, private val resourceType: ResourceType<Gas>) : IGasHandler {
     private val resource = disk.getCapability(Capabilities.Disk.RESOURCE)!!
     private var id: ResourceIdentifier<Gas>?
         get() = disk.get(resourceType.id)
@@ -91,30 +92,28 @@ class DiskGasHandler(private val disk: ItemStack, private val filter: BulkItMeka
         }
     }
 
-    override fun isValid(tank: Int, stack: GasStack): Boolean = when (filter) {
-        BulkItMekanism.GasFilter.ALL -> true
-        BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE -> !stack.isRadioactive
-        BulkItMekanism.GasFilter.ONLY_RADIOACTIVE -> stack.isRadioactive
+    override fun isValid(tank: Int, stack: GasStack): Boolean = when (resourceType) {
+        BulkIt.GAS_NON_RADIOACTIVE.get() -> !stack.isRadioactive
+        BulkIt.GAS_RADIOACTIVE.get() -> stack.isRadioactive
+        else -> false
     }
 
-    private fun toIdentifier(stack: GasStack): ResourceIdentifier<Gas> =
-        ResourceIdentifier(stack.chemicalHolder, DataComponentPatch.EMPTY)
-
-    private fun toStack(amount: Long): GasStack = id?.let { GasStack(it.resource, amount) } ?: GasStack.EMPTY
+    private fun toIdentifier(stack: GasStack): ResourceIdentifier<Gas> = stack.identifier()
+    private fun toStack(amount: Long): GasStack = id?.of(amount) ?: GasStack.EMPTY
     private fun toStack(): GasStack = toStack(resource.amount)
 
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER = 32
 
         fun capacity(resource: IDiskResourceHandler): Int =
-            FluidType.BUCKET_VOLUME * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
+            FluidType.BUCKET_VOLUME * resource.getMultiplier(DEFAULT_CAPACITY_MULTIPLIER)
 
         @Suppress("UNUSED_PARAMETER")
         fun buildOnlyNonRadioactive(disk: ItemStack, ctx: Void?): IGasHandler =
-            DiskGasHandler(disk, BulkItMekanism.GasFilter.ONLY_NON_RADIOACTIVE)
+            DiskGasHandler(disk, BulkIt.GAS_NON_RADIOACTIVE.get())
 
         @Suppress("UNUSED_PARAMETER")
         fun buildOnlyRadioactive(disk: ItemStack, ctx: Void?): IGasHandler =
-            DiskGasHandler(disk, BulkItMekanism.GasFilter.ONLY_RADIOACTIVE)
+            DiskGasHandler(disk, BulkIt.GAS_RADIOACTIVE.get())
     }
 }

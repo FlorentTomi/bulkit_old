@@ -1,6 +1,6 @@
 package net.asch.bulkit.datagen
 
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.asch.bulkit.common.item.Items
 import net.minecraft.core.HolderLookup
 import net.minecraft.data.PackOutput
@@ -18,7 +18,7 @@ class ItemTags(
     lookupProvider: CompletableFuture<HolderLookup.Provider>,
     blockTagProvider: CompletableFuture<TagLookup<Block>>,
     helper: ExistingFileHelper
-) : ItemTagsProvider(packOutput, lookupProvider, blockTagProvider, BulkIt.ID, helper) {
+) : ItemTagsProvider(packOutput, lookupProvider, blockTagProvider, BulkItApi.ID, helper) {
     override fun addTags(provider: HolderLookup.Provider) {
         tag(WRENCHES).add(Items.DRIVE_NETWORK_CONFIGURATOR.get())
         tag(TOOLS_WRENCH).add(Items.DRIVE_NETWORK_CONFIGURATOR.get())

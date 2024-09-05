@@ -3,14 +3,12 @@ package net.asch.bulkit.common.capability.drive_network
 import net.asch.bulkit.api.block.DriveNetworkViewBase
 import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.api.capability.IDriveNetworkLink
-import net.asch.bulkit.common.Resources
 import net.minecraft.core.Direction
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.neoforged.neoforge.items.IItemHandler
 
 class DriveNetworkViewItemHandler(blockEntity: BlockEntity, ctx: Direction) : IItemHandler {
-    private val resourceType = Resources.ITEM.get()
     private val nSlots = blockEntity.blockState.getValue(DriveNetworkViewBase.N_SLOTS_STATE)
     private val link: IDriveNetworkLink? = blockEntity.level?.getCapability(
         Capabilities.DriveNetwork.LINK, blockEntity.blockPos, blockEntity.blockState, blockEntity, ctx

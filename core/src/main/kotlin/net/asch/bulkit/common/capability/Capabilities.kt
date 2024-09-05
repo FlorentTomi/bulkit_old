@@ -1,6 +1,6 @@
 package net.asch.bulkit.common.capability
 
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.common.block_entity.BlockEntities
 import net.asch.bulkit.common.capability.drive_network.DiskDriveStorage
@@ -12,7 +12,7 @@ import net.neoforged.neoforge.items.IItemHandler
 
 object Capabilities {
     val DISK_STORAGE: BlockCapability<IItemHandler, Direction?> =
-        BlockCapability.createSided(BulkIt.location("disk_storage"), IItemHandler::class.java)
+        BlockCapability.createSided(BulkItApi.location("disk_storage"), IItemHandler::class.java)
 
     fun register(event: RegisterCapabilitiesEvent) {
         event.registerBlockEntity(

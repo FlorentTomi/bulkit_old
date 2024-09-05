@@ -6,6 +6,7 @@ import net.asch.bulkit.api.data.ResourceIdentifier
 import net.asch.bulkit.common.Resources
 import net.asch.bulkit.common.data.extensions.identifier
 import net.asch.bulkit.common.data.extensions.of
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.material.Fluid
 import net.neoforged.neoforge.fluids.FluidStack
@@ -105,6 +106,6 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
         fun build(stack: ItemStack, ctx: Void?) = DiskFluidHandler(stack)
 
         fun capacity(resource: IDiskResourceHandler): Int =
-            FluidType.BUCKET_VOLUME * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
+            FluidType.BUCKET_VOLUME * resource.getMultiplier(DEFAULT_CAPACITY_MULTIPLIER)
     }
 }

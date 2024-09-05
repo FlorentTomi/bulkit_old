@@ -1,6 +1,6 @@
 package net.asch.bulkit.common.block
 
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.asch.bulkit.api.block.DriveNetworkViewBase
 import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters
 import net.minecraft.world.item.CreativeModeTab.Output
@@ -12,7 +12,7 @@ import net.neoforged.neoforge.registries.DeferredBlock
 import net.neoforged.neoforge.registries.DeferredRegister
 
 object Blocks {
-    private val REGISTER = DeferredRegister.createBlocks(BulkIt.ID)
+    private val REGISTER = DeferredRegister.createBlocks(BulkItApi.ID)
     private val BASE_BLOCK_PROPERTIES =
         Properties.of().destroyTime(0.5f).explosionResistance(1200.0f).sound(SoundType.METAL)
             .pushReaction(PushReaction.BLOCK)

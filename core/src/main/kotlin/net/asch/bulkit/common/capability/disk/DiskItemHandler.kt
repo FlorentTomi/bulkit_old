@@ -98,7 +98,7 @@ class DiskItemHandler(private val disk: ItemStack) : IItemHandler {
         fun build(stack: ItemStack, ctx: Void?) = DiskItemHandler(stack)
 
         fun capacity(maxStackSize: Int, resource: IDiskResourceHandler): Int =
-            maxStackSize * resource.multiplier(DEFAULT_CAPACITY_MULTIPLIER)
+            maxStackSize * resource.getMultiplier(DEFAULT_CAPACITY_MULTIPLIER)
 
         fun capacity(stack: ItemStack, resource: IDiskResourceHandler): Int = capacity(stack.maxStackSize, resource)
     }

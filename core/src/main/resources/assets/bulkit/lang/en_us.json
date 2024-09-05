@@ -1,5 +1,11 @@
 {
+  "bulkit.resource.energy.name": "Energy",
+
   "bulkit.configurator.clear_root": "[BulkIt]: connection cleared",
   "bulkit.configurator.set_root": "[BulkIt]: root drive set to [%s]",
-  "bulkit.configurator.link": "[BulkIt]: linked [%s] to [%s]"
+  "bulkit.configurator.link": "[BulkIt]: linked [%s] to [%s]",
+
+  "bulkit.screen.disk.amount": "Amount: %s",
+  "bulkit.screen.disk.locked": "Locked",
+  "bulkit.screen.disk.void": "Void excess"
 }

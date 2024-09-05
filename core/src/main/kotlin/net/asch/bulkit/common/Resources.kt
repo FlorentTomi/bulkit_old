@@ -1,16 +1,13 @@
 package net.asch.bulkit.common
 
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.api.registry.DeferredResources
 import net.asch.bulkit.api.registry.ResourceType
-import net.asch.bulkit.client.gui.resource.DiskResourceFluidRenderer
-import net.asch.bulkit.client.gui.resource.DiskResourceItemRenderer
+import net.asch.bulkit.api.registry.resourceLess
 import net.asch.bulkit.common.block_entity.BlockEntities
-import net.asch.bulkit.common.capability.disk.DiskFluidHandler
-import net.asch.bulkit.common.capability.disk.DiskItemHandler
-import net.asch.bulkit.common.capability.disk.DiskModHandler
-import net.asch.bulkit.common.capability.disk.DiskResourceHandler
+import net.asch.bulkit.common.capability.disk.*
+import net.asch.bulkit.common.capability.drive_network.DriveNetworkViewEnergyHandler
 import net.asch.bulkit.common.capability.drive_network.DriveNetworkViewFluidHandler
 import net.asch.bulkit.common.capability.drive_network.DriveNetworkViewItemHandler
 import net.asch.bulkit.common.data.DataComponents
@@ -24,15 +21,13 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import net.neoforged.neoforge.registries.DeferredHolder
 
 object Resources {
-    private val REGISTER: DeferredResources = DeferredResources(BulkIt.ID)
+    private val REGISTER: DeferredResources = DeferredResources.create(BulkItApi.ID)
 
     val ITEM: DeferredHolder<ResourceType<*>, ResourceType<Item>> = REGISTER.registerResourceType(
         ResourceType.Builder<Item>(
             "item", DataComponents.REGISTER, Items.REGISTER
         ).registry(BuiltInRegistries.ITEM).defaultDisk().diskHandler(
-            net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.ITEM,
-            DiskItemHandler::build,
-            DiskResourceItemRenderer::build
+            net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.ITEM, DiskItemHandler::build
         ).driveNetworkViewHandler(
             net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, DriveNetworkViewItemHandler::build
         )
@@ -42,11 +37,19 @@ object Resources {
         ResourceType.Builder<Fluid>(
             "fluid", DataComponents.REGISTER, Items.REGISTER
         ).registry(BuiltInRegistries.FLUID).defaultDisk().diskHandler(
-            net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM,
-            DiskFluidHandler::build,
-            DiskResourceFluidRenderer::build
+            net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM, DiskFluidHandler::build
         ).driveNetworkViewHandler(
             net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, DriveNetworkViewFluidHandler::build
+        )
+    )
+
+    val ENERGY: DeferredHolder<ResourceType<*>, ResourceType<Unit>> = REGISTER.registerResourceType(
+        ResourceType.Builder<Unit>(
+            "energy", DataComponents.REGISTER, Items.REGISTER
+        ).resourceLess().defaultDisk().diskHandler(
+            net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.ITEM, DiskEnergyHandler::build
+        ).driveNetworkViewHandler(
+            net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, DriveNetworkViewEnergyHandler::build
         )
     )
 

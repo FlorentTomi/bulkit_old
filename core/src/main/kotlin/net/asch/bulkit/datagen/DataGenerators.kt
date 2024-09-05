@@ -1,11 +1,11 @@
 package net.asch.bulkit.datagen
 
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.data.event.GatherDataEvent
 
-@EventBusSubscriber(modid = BulkIt.ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = BulkItApi.ID, bus = EventBusSubscriber.Bus.MOD)
 object DataGenerators {
     @SubscribeEvent
     private fun onGatherData(event: GatherDataEvent) {

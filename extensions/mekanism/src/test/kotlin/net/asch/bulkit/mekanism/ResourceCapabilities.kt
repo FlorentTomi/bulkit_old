@@ -8,7 +8,6 @@ import mekanism.common.registries.MekanismGases
 import net.asch.bulkit.api.capability.Capabilities
 import net.asch.bulkit.api.capability.IDiskResourceHandler
 import net.asch.bulkit.api.registry.ResourceType
-import net.asch.bulkit.mekanism.common.Resources
 import net.asch.bulkit.mekanism.common.capability.disk.DiskGasHandler
 import net.neoforged.neoforge.capabilities.ItemCapability
 import net.neoforged.neoforge.fluids.FluidType
@@ -21,12 +20,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 object ResourceCapabilities {
     @Test
     fun gasNonRadioactive() {
-        gas(Resources.GAS_NON_RADIOACTIVE.get(), MekanismGases.OXYGEN.get(), MekanismGases.PLUTONIUM.get())
+        gas(BulkIt.GAS_NON_RADIOACTIVE.get(), MekanismGases.OXYGEN.get(), MekanismGases.PLUTONIUM.get())
     }
 
     @Test
     fun gasRadioactive() {
-        gas(Resources.GAS_RADIOACTIVE.get(), MekanismGases.PLUTONIUM.get(), MekanismGases.OXYGEN.get())
+        gas(BulkIt.GAS_RADIOACTIVE.get(), MekanismGases.PLUTONIUM.get(), MekanismGases.OXYGEN.get())
     }
 
     private fun gas(resourceType: ResourceType<Gas>, compatibleGasType: Gas, incompatibleGasType: Gas) {

@@ -10,34 +10,17 @@ import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.items.IItemHandler
 
 class DiskResourceHandler(private val disk: ItemStack) : IDiskResourceHandler {
-    private var thisAmount: Long by DefaultedComponentDelegate(disk, DataComponents.DISK_AMOUNT, 0L)
-    private var thisLocked: Boolean by DefaultedComponentDelegate(disk, DataComponents.DISK_LOCKED, false)
-    private var thisVoid: Boolean by DefaultedComponentDelegate(disk, DataComponents.DISK_VOID, false)
-    private val thisMods: IItemHandler?
+    override var amount: Long by DefaultedComponentDelegate(disk, DataComponents.DISK_AMOUNT, 0L)
+    override var isLocked: Boolean by DefaultedComponentDelegate(disk, DataComponents.DISK_LOCKED, false)
+    override var isVoidExcess: Boolean by DefaultedComponentDelegate(disk, DataComponents.DISK_VOID, false)
+    override val mods: IItemHandler?
         get() = disk.getCapability(Capabilities.Disk.MODS)
 
-    override fun getAmount(): Long = thisAmount
-    override fun setAmount(value: Long) {
-        thisAmount = value
-    }
-
-    override fun isLocked(): Boolean = thisLocked
-    override fun setLocked(value: Boolean) {
-        thisLocked = value
-    }
-
-    override fun isVoidExcess(): Boolean = thisVoid
-    override fun setVoidExcess(value: Boolean) {
-        thisVoid = value
-    }
-
-    override fun mods(): IItemHandler? = thisMods
-
-    override fun multiplier(defaultMultiplier: Int): Int {
+    override fun getMultiplier(defaultMultiplier: Int): Int {
         var multiplier = 1
         var hasDowngrade = false
 
-        val mods = thisMods ?: return multiplier
+        val mods = mods ?: return multiplier
         for (slot in 0 until mods.slots) {
             val mod = mods.getStackInSlot(slot)
             val modItem = mod.item

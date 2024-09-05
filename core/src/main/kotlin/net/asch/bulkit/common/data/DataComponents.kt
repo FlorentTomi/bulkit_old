@@ -1,7 +1,7 @@
 package net.asch.bulkit.common.data
 
 import com.mojang.serialization.Codec
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.minecraft.core.BlockPos
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.network.codec.ByteBufCodecs
@@ -11,7 +11,7 @@ import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 
 object DataComponents {
-    val REGISTER: DeferredRegister.DataComponents = DeferredRegister.createDataComponents(BulkIt.ID)
+    val REGISTER: DeferredRegister.DataComponents = DeferredRegister.createDataComponents(BulkItApi.ID)
 
     val DISK_AMOUNT: DeferredHolder<DataComponentType<*>, DataComponentType<Long>> =
         REGISTER.registerComponentType("disk_amount") {

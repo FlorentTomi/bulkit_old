@@ -3,11 +3,12 @@ package net.asch.bulkit.common.command
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.LongArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import net.asch.bulkit.api.BulkIt
+import net.asch.bulkit.api.BulkItApi
 import net.asch.bulkit.common.command.fluid.FluidArgument
 import net.asch.bulkit.common.command.fluid.FluidInput
 import net.asch.bulkit.network.DiskPayloads
@@ -18,30 +19,13 @@ import net.minecraft.commands.arguments.item.ItemInput
 
 object DiskCommands {
     fun register(dispatcher: CommandDispatcher<CommandSourceStack>, buildContext: CommandBuildContext) {
-        val builder = LiteralArgumentBuilder.literal<CommandSourceStack>("${BulkIt.ID}:disk")
-        thenPrint(builder)
+        val builder = LiteralArgumentBuilder.literal<CommandSourceStack>("${BulkItApi.ID}:disk")
         thenAdd(builder, buildContext)
         thenGrow(builder)
         thenShrink(builder)
         thenLock(builder)
         thenVoid(builder)
         dispatcher.register(builder)
-    }
-
-    private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenPrint(builder: ArgumentBuilder<CommandSourceStack, T>) =
-        builder.then(
-            LiteralArgumentBuilder.literal<CommandSourceStack>("print").executes(::print)
-        )
-
-    @Suppress("UNUSED_PARAMETER")
-    private fun print(context: CommandContext<CommandSourceStack>): Int {
-//        val disk = context.source.player?.mainHandItem ?: return -1
-//        val diskCapability = disk.getCapability(Capabilities.DISK_RESOURCE) ?: return -1
-//        val msg = Component.empty().append(diskCapability.description)
-//            .append(": ${diskCapability.amount} / ${diskCapability.capacity}")
-
-//        BulkIt.sendMessageTo(context.source.player!!, msg)
-        return 0
     }
 
     private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenLock(builder: ArgumentBuilder<CommandSourceStack, T>) =
@@ -86,18 +70,24 @@ object DiskCommands {
                         ).executes(::addItem)
                     )
                 )
-            )
-            .then(
-            LiteralArgumentBuilder.literal<CommandSourceStack>("fluid").then(
-                RequiredArgumentBuilder.argument<CommandSourceStack, FluidInput>(
-                    "fluid", FluidArgument.fluid(buildContext)
-                ).then(
+            ).then(
+                LiteralArgumentBuilder.literal<CommandSourceStack>("fluid").then(
+                    RequiredArgumentBuilder.argument<CommandSourceStack, FluidInput>(
+                        "fluid", FluidArgument.fluid(buildContext)
+                    ).then(
+                        RequiredArgumentBuilder.argument<CommandSourceStack, Int>(
+                            "amount", IntegerArgumentType.integer(0)
+                        ).executes(::addFluid)
+                    )
+                )
+            ).then(
+                LiteralArgumentBuilder.literal<CommandSourceStack>("energy").then(
                     RequiredArgumentBuilder.argument<CommandSourceStack, Int>(
+
                         "amount", IntegerArgumentType.integer(0)
-                    ).executes(::addFluid)
+                    ).executes(::addEnergy)
                 )
             )
-        )
         )
     }
 
@@ -114,6 +104,12 @@ object DiskCommands {
         val amount = IntegerArgumentType.getInteger(context, "amount")
         val stack = fluid.createFluidStack(amount)
         DiskPayloads.addFluid(stack)
+        return 0
+    }
+
+    private fun addEnergy(context: CommandContext<CommandSourceStack>): Int {
+        val amount = LongArgumentType.getLong(context, "amount")
+        DiskPayloads.addEnergy(amount)
         return 0
     }
 

@@ -35,7 +35,5 @@ class FluidInput(private val fluid: Holder<Fluid>, private val components: DataC
         }.filter { it.first != null && !it.second.isEmpty }.map { "${it.first}=${it.second.get()}" }.joinToString(",")
     }
 
-    private fun fluidName(): String {
-        return fluid.unwrapKey().map { it.location().toString() }.orElseGet { "unknown[$fluid]" }
-    }
+    private fun fluidName(): String = fluid.unwrapKey().map { it.location().toString() }.orElseGet { "unknown[$fluid]" }
 }
