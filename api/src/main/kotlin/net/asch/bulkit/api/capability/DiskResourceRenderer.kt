@@ -19,8 +19,8 @@ abstract class DiskResourceRenderer<T>(private val disk: ItemStack, resourceType
 
     override val capacity: Long
         get() {
-            val id = disk.get(resourceIdType) ?: return 0L
-            val handler = disk.getCapability(Capabilities.Disk.RESOURCE) ?: return 0L
+            val id = disk.get(resourceIdType) ?: return 0
+            val handler = disk.getCapability(Capabilities.Disk.RESOURCE) ?: return 0
             return getResourceCapacity(id, handler)
         }
 
@@ -42,15 +42,15 @@ abstract class DiskResourceRenderer<T>(private val disk: ItemStack, resourceType
         }
 
         val diskResource = Objects.requireNonNull(disk.getCapability(Capabilities.Disk.RESOURCE))
-        renderResource(resourceId, diskResource!!.amount.toLong(), guiGraphics, size)
+        renderResource(resourceId, diskResource!!, guiGraphics, size)
 
         guiGraphics.pose().popPose()
     }
 
     protected abstract fun getResourceCapacity(id: ResourceIdentifier<T>, handler: IDiskResourceHandler): Long
-    protected abstract fun getResourceDescription(resourceId: ResourceIdentifier<T>): Component
+    protected abstract fun getResourceDescription(id: ResourceIdentifier<T>): Component
     protected abstract fun renderResource(
-        resourceId: ResourceIdentifier<T>, amount: Long, guiGraphics: GuiGraphics, size: Int
+        id: ResourceIdentifier<T>, handler: IDiskResourceHandler, guiGraphics: GuiGraphics, size: Int
     )
 
     protected fun renderItem(stack: ItemStack, guiGraphics: GuiGraphics, size: Int) {

@@ -20,11 +20,11 @@ class DiskGasHandler(private val disk: ItemStack, private val resourceType: Reso
         get() = disk.get(resourceType.id)
         set(value) {
             disk.set(resourceType.id, value)
-            resource.amount = 0
+            resource.amountL = 0L
         }
 
     private val capacity: Long
-        get() = capacity(resource).toLong()
+        get() = capacity(resource)
 
     override fun getTanks(): Int = 1
     override fun getChemicalInTank(tank: Int): GasStack = toStack()
@@ -39,7 +39,7 @@ class DiskGasHandler(private val disk: ItemStack, private val resourceType: Reso
             return stack
         }
 
-        val remainingCapacity = capacity - resource.amount
+        val remainingCapacity = capacity - resource.amountL
         val amountToInsert = if (!resource.isVoidExcess) minOf(remainingCapacity, stack.amount) else stack.amount
         if (amountToInsert == 0L) {
             return stack
@@ -50,14 +50,14 @@ class DiskGasHandler(private val disk: ItemStack, private val resourceType: Reso
                 id = toIdentifier(stack)
             }
 
-            resource.amount = minOf(capacity, resource.amount + amountToInsert)
+            resource.amountL = (minOf(capacity, resource.amountL + amountToInsert))
         }
 
         return if (amountToInsert == stack.amount) emptyStack else (stack.copyWithAmount(amountToInsert))
     }
 
     override fun extractChemical(tank: Int, amount: Long, action: Action): GasStack {
-        if (resource.amount == 0L) {
+        if (resource.amountL == 0L) {
             return emptyStack
         }
 
@@ -66,13 +66,13 @@ class DiskGasHandler(private val disk: ItemStack, private val resourceType: Reso
         }
 
         val toExtract = minOf(amount, FluidType.BUCKET_VOLUME.toLong())
-        if (resource.amount <= toExtract) {
+        if (resource.amountL <= toExtract) {
             val existing = toStack()
             if (action.execute()) {
                 if (!resource.isLocked) {
                     id = null
                 } else {
-                    resource.amount = 0
+                    resource.amountL = 0L
                 }
             }
 
@@ -80,7 +80,7 @@ class DiskGasHandler(private val disk: ItemStack, private val resourceType: Reso
         }
 
         if (action.execute()) {
-            resource.amount -= toExtract
+            resource.amountL -= toExtract
         }
 
         return toStack(toExtract)
@@ -100,13 +100,13 @@ class DiskGasHandler(private val disk: ItemStack, private val resourceType: Reso
 
     private fun toIdentifier(stack: GasStack): ResourceIdentifier<Gas> = stack.identifier()
     private fun toStack(amount: Long): GasStack = id?.of(amount) ?: GasStack.EMPTY
-    private fun toStack(): GasStack = toStack(resource.amount)
+    private fun toStack(): GasStack = toStack(resource.amountL)
 
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER = 32
 
-        fun capacity(resource: IDiskResourceHandler): Int =
-            FluidType.BUCKET_VOLUME * resource.getMultiplier(DEFAULT_CAPACITY_MULTIPLIER)
+        fun capacity(resource: IDiskResourceHandler): Long =
+            (FluidType.BUCKET_VOLUME * resource.getMultiplier(DEFAULT_CAPACITY_MULTIPLIER)).toLong()
 
         @Suppress("UNUSED_PARAMETER")
         fun buildOnlyNonRadioactive(disk: ItemStack, ctx: Void?): IGasHandler =

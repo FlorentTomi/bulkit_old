@@ -35,7 +35,7 @@ object ResourceCapabilities {
             Assertions.assertEquals(handler.tanks, 1)
             Assertions.assertEquals(handler.getChemicalInTank(0).isEmpty, true)
 
-            val capacity = DiskGasHandler.capacity(resourceHandler).toLong()
+            val capacity = DiskGasHandler.capacity(resourceHandler)
             val stackSize = capacity * 2
 
             val toInsertIncompatible = GasStack(incompatibleGasType, stackSize)
@@ -53,7 +53,7 @@ object ResourceCapabilities {
             Assertions.assertEquals(handler.tanks, 1)
             Assertions.assertEquals(handler.getChemicalInTank(0).isEmpty, true)
 
-            val capacity = DiskGasHandler.capacity(resourceHandler).toLong()
+            val capacity = DiskGasHandler.capacity(resourceHandler)
             val stackSize = capacity * 2
             val toInsert = GasStack(compatibleGasType, stackSize)
             val remaining = handler.insertChemical(toInsert, Action.EXECUTE)

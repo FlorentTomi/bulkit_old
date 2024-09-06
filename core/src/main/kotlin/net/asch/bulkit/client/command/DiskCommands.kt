@@ -31,7 +31,7 @@ object DiskCommands {
         val diskCap = disk.getCapability(Capabilities.Disk.RESOURCE) ?: return -1
         val resourceRendererCap = disk.getCapability(ClientCapabilities.RESOURCE_RENDERER) ?: return -1
         val msg = Component.empty().append(resourceRendererCap.description)
-            .append(": ${diskCap.amount} / ${resourceRendererCap.capacity}")
+            .append(": ${diskCap.amountL} / ${resourceRendererCap.capacity}")
 
         player.displayClientMessage(msg, true)
         return 0

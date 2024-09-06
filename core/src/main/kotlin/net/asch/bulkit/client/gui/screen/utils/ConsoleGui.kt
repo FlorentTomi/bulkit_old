@@ -97,7 +97,7 @@ object ConsoleGui {
 //        var currentY = innerY
 
         guiGraphics.drawString(
-            font, LangEntries.SCREEN_DISK_AMOUNT.component(resource?.amount ?: 0), innerX, innerY, Color.green.rgb
+            font, LangEntries.SCREEN_DISK_AMOUNT.component(resource?.amountL ?: 0L), innerX, innerY, Color.green.rgb
         )
 
 //        currentY += offset

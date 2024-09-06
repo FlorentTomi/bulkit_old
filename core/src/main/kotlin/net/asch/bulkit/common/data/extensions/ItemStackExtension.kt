@@ -5,4 +5,4 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 
 fun ItemStack.identifier(): ResourceIdentifier<Item> = ResourceIdentifier(itemHolder, componentsPatch)
-fun ResourceIdentifier<Item>.of(amount: Long): ItemStack = ItemStack(resource, amount.toInt(), dataComponents)
+fun ResourceIdentifier<Item>.of(amount: Int): ItemStack = ItemStack(resource, amount, dataComponents)

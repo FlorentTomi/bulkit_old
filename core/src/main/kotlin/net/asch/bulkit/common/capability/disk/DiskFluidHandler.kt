@@ -6,7 +6,6 @@ import net.asch.bulkit.api.data.ResourceIdentifier
 import net.asch.bulkit.common.Resources
 import net.asch.bulkit.common.data.extensions.identifier
 import net.asch.bulkit.common.data.extensions.of
-import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.material.Fluid
 import net.neoforged.neoforge.fluids.FluidStack
@@ -21,15 +20,15 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
         get() = disk.get(resourceType.id)
         set(value) {
             disk.set(resourceType.id, value)
-            resource.amount = 0;
+            resource.amountL = 0L
         }
 
-    private val capacity: Long
-        get() = capacity(resource).toLong()
+    private val capacity: Int
+        get() = capacity(resource)
 
     override fun getTanks(): Int = 1
     override fun getFluidInTank(tank: Int): FluidStack = toStack()
-    override fun getTankCapacity(tank: Int): Int = minOf(FluidType.BUCKET_VOLUME, capacity.toInt())
+    override fun getTankCapacity(tank: Int): Int = minOf(FluidType.BUCKET_VOLUME, capacity)
     override fun isFluidValid(tank: Int, stack: FluidStack): Boolean = (id == null) || (id == stack.identifier())
 
     override fun getContainer(): ItemStack = disk
@@ -43,19 +42,19 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
             return 0
         }
 
-        val remainingCapacity = capacity - resource.amount
+        val remainingCapacity = capacity - resource.amountI
         val amountToInsert =
-            if (!resource.isVoidExcess) minOf(remainingCapacity, stack.amount.toLong()) else stack.amount.toLong()
+            if (!resource.isVoidExcess) minOf(remainingCapacity, stack.amount) else stack.amount
 
         if (action.execute()) {
             if (id == null) {
                 id = stack.identifier()
             }
 
-            resource.amount = minOf(capacity, resource.amount + amountToInsert)
+            resource.amountI = minOf(capacity, resource.amountI + amountToInsert)
         }
 
-        return amountToInsert.toInt()
+        return amountToInsert
     }
 
     override fun drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack {
@@ -71,18 +70,18 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
             return FluidStack.EMPTY
         }
 
-        if (id == null || resource.amount == 0L) {
+        if (id == null || resource.amountI == 0) {
             return FluidStack.EMPTY
         }
 
         val toExtract = minOf(amount, FluidType.BUCKET_VOLUME)
-        if (resource.amount <= toExtract) {
+        if (resource.amountI <= toExtract) {
             val existing = toStack()
             if (action.execute()) {
                 if (!resource.isLocked) {
                     id = null
                 } else {
-                    resource.amount = 0
+                    resource.amountI = 0
                 }
             }
 
@@ -90,14 +89,14 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
         }
 
         if (action.execute()) {
-            resource.amount -= toExtract
+            resource.amountI -= toExtract
         }
 
-        return toStack(toExtract.toLong())
+        return toStack(toExtract)
     }
 
-    private fun toStack(amount: Long): FluidStack = id?.of(amount) ?: FluidStack.EMPTY
-    private fun toStack(): FluidStack = toStack(resource.amount)
+    private fun toStack(amount: Int): FluidStack = id?.of(amount) ?: FluidStack.EMPTY
+    private fun toStack(): FluidStack = toStack(resource.amountI)
 
     companion object {
         private const val DEFAULT_CAPACITY_MULTIPLIER: Int = 32
@@ -106,6 +105,6 @@ class DiskFluidHandler(private val disk: ItemStack) : IFluidHandlerItem {
         fun build(stack: ItemStack, ctx: Void?) = DiskFluidHandler(stack)
 
         fun capacity(resource: IDiskResourceHandler): Int =
-            FluidType.BUCKET_VOLUME * resource.getMultiplier(DEFAULT_CAPACITY_MULTIPLIER)
+            (FluidType.BUCKET_VOLUME * resource.getMultiplier(DEFAULT_CAPACITY_MULTIPLIER))
     }
 }

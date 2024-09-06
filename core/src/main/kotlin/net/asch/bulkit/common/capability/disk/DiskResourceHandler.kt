@@ -8,9 +8,16 @@ import net.asch.bulkit.common.item.mod.CapacityDowngradeMod
 import net.asch.bulkit.common.item.mod.CapacityUpgradeMod
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.items.IItemHandler
+import kotlin.reflect.KClass
 
 class DiskResourceHandler(private val disk: ItemStack) : IDiskResourceHandler {
-    override var amount: Long by DefaultedComponentDelegate(disk, DataComponents.DISK_AMOUNT, 0L)
+    override var amountL: Long by DefaultedComponentDelegate(disk, DataComponents.DISK_AMOUNT, 0)
+    override var amountI: Int
+        get() = amountL.toInt()
+        set(value) {
+            amountL = value.toLong()
+        }
+
     override var isLocked: Boolean by DefaultedComponentDelegate(disk, DataComponents.DISK_LOCKED, false)
     override var isVoidExcess: Boolean by DefaultedComponentDelegate(disk, DataComponents.DISK_VOID, false)
     override val mods: IItemHandler?

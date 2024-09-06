@@ -108,7 +108,7 @@ object DiskCommands {
     }
 
     private fun addEnergy(context: CommandContext<CommandSourceStack>): Int {
-        val amount = LongArgumentType.getLong(context, "amount")
+        val amount = IntegerArgumentType.getInteger(context, "amount")
         DiskPayloads.addEnergy(amount)
         return 0
     }
@@ -116,28 +116,28 @@ object DiskCommands {
     private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenGrow(builder: ArgumentBuilder<CommandSourceStack, T>) =
         builder.then(
             LiteralArgumentBuilder.literal<CommandSourceStack>("grow").requires { it.hasPermission(2) }.then(
-                RequiredArgumentBuilder.argument<CommandSourceStack, Int>("amount", IntegerArgumentType.integer(0))
+                RequiredArgumentBuilder.argument<CommandSourceStack, Long>("amount", LongArgumentType.longArg(0L))
                     .executes(::grow)
             )
         )
 
     private fun grow(context: CommandContext<CommandSourceStack>): Int {
-        val amount = IntegerArgumentType.getInteger(context, "amount")
-        DiskPayloads.grow(amount.toLong())
+        val amount = LongArgumentType.getLong(context, "amount")
+        DiskPayloads.grow(amount)
         return 0
     }
 
     private fun <T : ArgumentBuilder<CommandSourceStack, T>> thenShrink(builder: ArgumentBuilder<CommandSourceStack, T>) =
         builder.then(
             LiteralArgumentBuilder.literal<CommandSourceStack>("shrink").requires { it.hasPermission(2) }.then(
-                RequiredArgumentBuilder.argument<CommandSourceStack, Int>("amount", IntegerArgumentType.integer(0))
+                RequiredArgumentBuilder.argument<CommandSourceStack, Long>("amount", LongArgumentType.longArg(0))
                     .executes(::shrink)
             )
         )
 
     private fun shrink(context: CommandContext<CommandSourceStack>): Int {
-        val amount = IntegerArgumentType.getInteger(context, "amount")
-        DiskPayloads.shrink(amount.toLong())
+        val amount = LongArgumentType.getLong(context, "amount")
+        DiskPayloads.shrink(amount)
         return 0
     }
 }

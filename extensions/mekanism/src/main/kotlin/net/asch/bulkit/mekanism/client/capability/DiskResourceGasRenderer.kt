@@ -24,14 +24,14 @@ import net.minecraft.world.item.ItemStack
 class DiskResourceGasRenderer(disk: ItemStack, resourceType: ResourceType<Gas>) :
     DiskResourceRenderer<Gas>(disk, resourceType) {
     override fun getResourceCapacity(id: ResourceIdentifier<Gas>, handler: IDiskResourceHandler): Long =
-        DiskGasHandler.capacity(handler).toLong()
+        DiskGasHandler.capacity(handler)
 
-    override fun getResourceDescription(resourceId: ResourceIdentifier<Gas>): Component = resourceId.of(1).textComponent
+    override fun getResourceDescription(id: ResourceIdentifier<Gas>): Component = id.of(1).textComponent
 
     override fun renderResource(
-        resourceId: ResourceIdentifier<Gas>, amount: Long, guiGraphics: GuiGraphics, size: Int
+        id: ResourceIdentifier<Gas>, handler: IDiskResourceHandler, guiGraphics: GuiGraphics, size: Int
     ) {
-        val gas = resourceId.resource.value()
+        val gas = id.resource.value()
 
         val sprite = MekanismRenderer.getChemicalTexture(gas)
         MekanismRenderer.color(guiGraphics, gas)

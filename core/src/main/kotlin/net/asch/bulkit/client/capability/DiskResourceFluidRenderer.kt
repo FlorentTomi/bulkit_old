@@ -24,12 +24,12 @@ class DiskResourceFluidRenderer(disk: ItemStack) : DiskResourceRenderer<Fluid>(d
     override fun getResourceCapacity(id: ResourceIdentifier<Fluid>, handler: IDiskResourceHandler): Long =
         DiskFluidHandler.capacity(handler).toLong()
 
-    override fun getResourceDescription(resourceId: ResourceIdentifier<Fluid>): Component = resourceId.of(1).hoverName
+    override fun getResourceDescription(id: ResourceIdentifier<Fluid>): Component = id.of(1).hoverName
 
     override fun renderResource(
-        resourceId: ResourceIdentifier<Fluid>, amount: Long, guiGraphics: GuiGraphics, size: Int
+        id: ResourceIdentifier<Fluid>, handler: IDiskResourceHandler, guiGraphics: GuiGraphics, size: Int
     ) {
-        val stack = resourceId.of(amount)
+        val stack = id.of(handler.amountI)
 
         val fluidRenderProperties = IClientFluidTypeExtensions.of(stack.fluidType)
         val stillTexture = fluidRenderProperties.stillTexture

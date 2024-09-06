@@ -17,13 +17,12 @@ class DiskResourceItemRenderer(disk: ItemStack) : DiskResourceRenderer<Item>(
     override fun getResourceCapacity(id: ResourceIdentifier<Item>, handler: IDiskResourceHandler): Long =
         DiskItemHandler.capacity(id.resource.value().defaultMaxStackSize, handler).toLong()
 
-    override fun getResourceDescription(resourceId: ResourceIdentifier<Item>): Component =
-        resourceId.of(1).hoverName
+    override fun getResourceDescription(id: ResourceIdentifier<Item>): Component = id.of(1).hoverName
 
     override fun renderResource(
-        resourceId: ResourceIdentifier<Item>, amount: Long, guiGraphics: GuiGraphics, size: Int
+        id: ResourceIdentifier<Item>, handler: IDiskResourceHandler, guiGraphics: GuiGraphics, size: Int
     ) {
-        val stack = resourceId.of(amount)
+        val stack = id.of(handler.amountI)
         renderItem(stack, guiGraphics, size)
     }
 

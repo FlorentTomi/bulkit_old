@@ -26,7 +26,7 @@ object DiskPayloads {
 
     fun addItem(stack: ItemStack) = BulkItApi.sendToServer(AddItem(stack))
     fun addFluid(stack: FluidStack) = BulkItApi.sendToServer(AddFluid(stack))
-    fun addEnergy(amount: Long) = BulkItApi.sendToServer(AddEnergy(amount))
+    fun addEnergy(amount: Int) = BulkItApi.sendToServer(AddEnergy(amount))
     fun grow(amount: Long) = BulkItApi.sendToServer(Grow(amount))
     fun shrink(amount: Long) = BulkItApi.sendToServer(Shrink(amount))
     fun lock(locked: Boolean) = BulkItApi.sendToServer(Lock(locked))
@@ -53,17 +53,17 @@ object DiskPayloads {
             AddEnergy.TYPE -> {
                 val diskCapability =
                     mainHandItem.getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.ITEM)
-                diskCapability?.receiveEnergy((payload as AddEnergy).amount.toInt(), false)
+                diskCapability?.receiveEnergy((payload as AddEnergy).amount, false)
             }
 
             Grow.TYPE -> {
                 val diskCapability = mainHandItem.getCapability(Capabilities.Disk.RESOURCE)
-                diskCapability?.let { diskCapability.amount += (payload as Grow).amount }
+                diskCapability?.let { diskCapability.amountL += (payload as Grow).amount }
             }
 
             Shrink.TYPE -> {
                 val diskCapability = mainHandItem.getCapability(Capabilities.Disk.RESOURCE)
-                diskCapability?.let { diskCapability.amount -= (payload as Shrink).amount }
+                diskCapability?.let { diskCapability.amountL -= (payload as Shrink).amount }
             }
 
             Lock.TYPE -> {
@@ -100,13 +100,13 @@ object DiskPayloads {
         }
     }
 
-    private class AddEnergy(val amount: Long) : CustomPacketPayload {
+    private class AddEnergy(val amount: Int) : CustomPacketPayload {
         override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> = TYPE
 
         companion object {
             val TYPE = CustomPacketPayload.Type<AddEnergy>(BulkIt.location("disk_add_energy"))
             val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, AddEnergy> = StreamCodec.composite(
-                ByteBufCodecs.VAR_LONG, AddEnergy::amount, ::AddEnergy
+                ByteBufCodecs.VAR_INT, AddEnergy::amount, ::AddEnergy
             )
         }
     }
